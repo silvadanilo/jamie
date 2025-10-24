@@ -33,6 +33,7 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
           type="datetime-local"
           label="Date & Time"
           required
+          step="900"
         />
 
         <.input field={@form[:location]} type="text" label="Location" />

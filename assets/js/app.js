@@ -46,6 +46,44 @@ liveSocket.connect()
 // >> liveSocket.disableLatencySim()
 window.liveSocket = liveSocket
 
+// Round datetime-local inputs to 15-minute intervals
+document.addEventListener('DOMContentLoaded', () => {
+  const roundTo15Minutes = (input) => {
+    if (!input.value) return
+    
+    const date = new Date(input.value)
+    const minutes = date.getMinutes()
+    const roundedMinutes = Math.round(minutes / 15) * 15
+    
+    date.setMinutes(roundedMinutes)
+    date.setSeconds(0)
+    date.setMilliseconds(0)
+    
+    // Format as datetime-local string (YYYY-MM-DDTHH:mm)
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const mins = String(date.getMinutes()).padStart(2, '0')
+    
+    input.value = `${year}-${month}-${day}T${hours}:${mins}`
+  }
+  
+  // Handle datetime-local inputs
+  document.addEventListener('change', (e) => {
+    if (e.target.type === 'datetime-local' && e.target.step === '900') {
+      roundTo15Minutes(e.target)
+    }
+  })
+  
+  // Also handle on blur to catch manual entries
+  document.addEventListener('blur', (e) => {
+    if (e.target.type === 'datetime-local' && e.target.step === '900') {
+      roundTo15Minutes(e.target)
+    }
+  }, true)
+})
+
 // The lines below enable quality of life phoenix_live_reload
 // development features:
 //
