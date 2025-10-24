@@ -1,6 +1,8 @@
 defmodule JamieWeb.Router do
   use JamieWeb, :router
 
+  import JamieWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -8,6 +10,7 @@ defmodule JamieWeb.Router do
     plug :put_root_layout, html: {JamieWeb.Layouts, :root}
     plug :protect_from_forgery
     plug :put_secure_browser_headers
+    plug :fetch_current_user
   end
 
   pipeline :api do
@@ -17,7 +20,47 @@ defmodule JamieWeb.Router do
   scope "/", JamieWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    live_session :public,
+      on_mount: [{JamieWeb.UserAuth, :mount_current_user}] do
+      live "/", HomeLive, :index
+    end
+  end
+
+  scope "/", JamieWeb do
+    pipe_through [:browser, :redirect_if_user_is_authenticated]
+
+    live_session :redirect_if_user_is_authenticated,
+      on_mount: [{JamieWeb.UserAuth, :redirect_if_user_is_authenticated}] do
+      live "/register", UserRegistrationLive, :new
+      live "/login", UserLoginLive, :new
+    end
+
+    post "/login", UserSessionController, :create
+  end
+
+  scope "/", JamieWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :require_authenticated_user,
+      on_mount: [{JamieWeb.UserAuth, :ensure_authenticated}] do
+      live "/users/settings", UserSettingsLive, :edit
+
+      live "/occurences", OccurenceLive.Index, :index
+      live "/occurences/new", OccurenceLive.New, :new
+      live "/occurences/:id/edit", OccurenceLive.Edit, :edit
+    end
+  end
+
+  scope "/", JamieWeb do
+    pipe_through [:browser]
+
+    delete "/logout", UserSessionController, :delete
+    get "/users/magic-link/:token", UserMagicLinkController, :show
+
+    live_session :current_user,
+      on_mount: [{JamieWeb.UserAuth, :mount_current_user}] do
+      live "/users/confirm/:token", UserConfirmationLive, :edit
+    end
   end
 
   # Other scopes may use custom stacks.

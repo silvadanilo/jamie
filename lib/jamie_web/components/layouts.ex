@@ -35,38 +35,92 @@ defmodule JamieWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar px-4 sm:px-6 lg:px-8">
+    <header class="navbar bg-base-100 shadow-md px-4 sm:px-6 lg:px-8 sticky top-0 z-50 backdrop-blur-sm bg-base-100/80">
       <div class="flex-1">
-        <a href="/" class="flex-1 flex w-fit items-center gap-2">
-          <img src={~p"/images/logo.svg"} width="36" />
-          <span class="text-sm font-semibold">v{Application.spec(:phoenix, :vsn)}</span>
-        </a>
+        <.link navigate={~p"/"} class="flex items-center gap-3 hover:opacity-80 transition-opacity">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl">
+            J
+          </div>
+          <span class="text-xl font-bold">Jamie</span>
+        </.link>
       </div>
       <div class="flex-none">
-        <ul class="flex flex-column px-1 space-x-4 items-center">
-          <li>
-            <a href="https://phoenixframework.org/" class="btn btn-ghost">Website</a>
-          </li>
-          <li>
-            <a href="https://github.com/phoenixframework/phoenix" class="btn btn-ghost">GitHub</a>
-          </li>
+        <ul class="flex items-center gap-2 sm:gap-4">
           <li>
             <.theme_toggle />
           </li>
-          <li>
-            <a href="https://hexdocs.pm/phoenix/overview.html" class="btn btn-primary">
-              Get Started <span aria-hidden="true">&rarr;</span>
-            </a>
-          </li>
+          <%= if @current_scope do %>
+            <li class="hidden sm:block">
+              <.link navigate={~p"/occurences"} class="btn btn-ghost btn-sm">
+                <.icon name="hero-calendar" class="h-4 w-4" /> My Events
+              </.link>
+            </li>
+            <li class="hidden md:block">
+              <.link href={~p"/logout"} method="delete" class="btn btn-ghost btn-sm">
+                <.icon name="hero-arrow-right-on-rectangle" class="h-4 w-4" /> Logout
+              </.link>
+            </li>
+            <li class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold">
+                  {String.first(@current_scope.email) |> String.upcase()}
+                </div>
+              </div>
+              <ul
+                tabindex="0"
+                class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow-xl border border-base-300 mt-3"
+              >
+                <li class="menu-title">
+                  <span class="text-xs truncate">{@current_scope.email}</span>
+                </li>
+                <li class="sm:hidden">
+                  <.link navigate={~p"/occurences"}>
+                    <.icon name="hero-calendar" class="h-4 w-4" /> My Events
+                  </.link>
+                </li>
+                <li>
+                  <.link navigate={~p"/users/settings"}>
+                    <.icon name="hero-cog-6-tooth" class="h-4 w-4" /> Settings
+                  </.link>
+                </li>
+                <li>
+                  <.link href={~p"/logout"} method="delete">
+                    <.icon name="hero-arrow-right-on-rectangle" class="h-4 w-4" /> Logout
+                  </.link>
+                </li>
+              </ul>
+            </li>
+          <% else %>
+            <li>
+              <.link navigate={~p"/login"} class="btn btn-ghost btn-sm">
+                Sign In
+              </.link>
+            </li>
+            <li>
+              <.link navigate={~p"/register"} class="btn btn-primary btn-sm">
+                Get Started
+              </.link>
+            </li>
+          <% end %>
         </ul>
       </div>
     </header>
 
-    <main class="px-4 py-20 sm:px-6 lg:px-8">
-      <div class="mx-auto max-w-2xl space-y-4">
-        {render_slot(@inner_block)}
-      </div>
+    <main>
+      {render_slot(@inner_block)}
     </main>
+
+    <footer class="footer footer-center p-10 bg-base-200 text-base-content mt-auto">
+      <aside>
+        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl mb-4">
+          J
+        </div>
+        <p class="font-bold">
+          Jamie - Your Jam Session Platform
+        </p>
+        <p>Copyright © {DateTime.utc_now().year} - All rights reserved</p>
+      </aside>
+    </footer>
 
     <.flash_group flash={@flash} />
     """
