@@ -22,14 +22,95 @@ import "phoenix_html"
 // Establish Phoenix Socket and LiveView configuration.
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
-import {hooks as colocatedHooks} from "phoenix-colocated/jamie"
 import topbar from "../vendor/topbar"
+
+const PlacesAutocomplete = {
+  mounted() {
+    this.retryCount = 0
+    this.maxRetries = 20
+    this.initAutocomplete()
+  },
+  
+  updated() {
+    if (!this.autocompleteElement) {
+      this.retryCount = 0
+      this.initAutocomplete()
+    }
+  },
+  
+  initAutocomplete() {
+    if (this.autocompleteElement) return
+    
+    if (typeof google === 'undefined' || !google.maps || !google.maps.places || !google.maps.places.PlaceAutocompleteElement) {
+      this.retryCount++
+      if (this.retryCount < this.maxRetries) {
+        setTimeout(() => this.initAutocomplete(), 100)
+      } else {
+        console.warn('Google Maps Places API not loaded. Please set GOOGLE_MAPS_API_KEY environment variable.')
+      }
+      return
+    }
+    
+    const input = this.el
+    const form = input.closest('form')
+    
+    // Create the new PlaceAutocompleteElement
+    this.autocompleteElement = new google.maps.places.PlaceAutocompleteElement()
+    
+    // Replace the input with the autocomplete element
+    input.parentNode.insertBefore(this.autocompleteElement, input)
+    input.style.display = 'none'
+    
+    // Style the autocomplete element to match our input
+    this.autocompleteElement.style.width = '100%'
+    
+    // Listen for place selection
+    this.autocompleteElement.addEventListener('gmp-placeselect', async (event) => {
+      const place = event.place
+      
+      if (!place.location) {
+        console.warn('No location for place')
+        return
+      }
+      
+      const lat = place.location.lat()
+      const lng = place.location.lng()
+      const placeId = place.id
+      const displayName = place.displayName || place.formattedAddress
+      
+      // Update the hidden input value
+      input.value = displayName
+      
+      // Update the hidden coordinate fields
+      const latInput = form.querySelector('input[name="occurence[latitude]"]')
+      const lngInput = form.querySelector('input[name="occurence[longitude]"]')
+      const placeIdInput = form.querySelector('input[name="occurence[google_place_id]"]')
+      
+      if (latInput) latInput.value = lat
+      if (lngInput) lngInput.value = lng
+      if (placeIdInput) placeIdInput.value = placeId
+      
+      // Trigger form change event for LiveView
+      form.dispatchEvent(new Event('change', { bubbles: true }))
+    })
+  },
+  
+  destroyed() {
+    if (this.autocompleteElement) {
+      this.autocompleteElement.remove()
+    }
+  }
+}
+
+const Hooks = {
+  PlacesAutocomplete
+}
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 const liveSocket = new LiveSocket("/live", Socket, {
   longPollFallbackMs: 2500,
   params: {_csrf_token: csrfToken},
-  hooks: {...colocatedHooks},
+  hooks: Hooks,
 })
 
 // Show progress bar on live navigation and form submits

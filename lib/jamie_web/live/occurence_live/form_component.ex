@@ -36,27 +36,30 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
           step="900"
         />
 
-        <.input field={@form[:location]} type="text" label="Location" />
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <.input
-            field={@form[:latitude]}
-            type="number"
-            label="Latitude"
-            step="any"
-          />
-          <.input
-            field={@form[:longitude]}
-            type="number"
-            label="Longitude"
-            step="any"
-          />
+        <div class="fieldset mb-4">
+          <label>
+            <span class="label mb-2 text-base">Location</span>
+            <div phx-update="ignore" id="location-autocomplete-wrapper">
+              <input
+                type="text"
+                id={@form[:location].id}
+                name={@form[:location].name}
+                value={Phoenix.HTML.Form.normalize_value("text", @form[:location].value)}
+                phx-hook="PlacesAutocomplete"
+                class="w-full input input-lg text-base min-h-[3rem]"
+                autocomplete="off"
+                placeholder="Search for a location..."
+              />
+            </div>
+          </label>
         </div>
 
-        <.input
-          field={@form[:google_place_id]}
-          type="text"
-          label="Google Place ID"
+        <input type="hidden" name={@form[:latitude].name} value={@form[:latitude].value || ""} />
+        <input type="hidden" name={@form[:longitude].name} value={@form[:longitude].value || ""} />
+        <input
+          type="hidden"
+          name={@form[:google_place_id].name}
+          value={@form[:google_place_id].value || ""}
         />
 
         <.input
@@ -122,31 +125,26 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
           rows="2"
         />
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <.input
-            field={@form[:show_available_spots]}
-            type="checkbox"
-            label="Show Available Spots"
-          />
-          <.input
-            field={@form[:show_partecipant_list]}
-            type="checkbox"
-            label="Show Participant List"
-          />
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <.input
-            field={@form[:is_private]}
-            type="checkbox"
-            label="Private Event"
-          />
-          <.input
-            field={@form[:disabled]}
-            type="checkbox"
-            label="Disabled"
-          />
-        </div>
+        <.input
+          field={@form[:show_available_spots]}
+          type="checkbox"
+          label="Show Available Spots"
+        />
+        <.input
+          field={@form[:show_partecipant_list]}
+          type="checkbox"
+          label="Show Participant List"
+        />
+        <.input
+          field={@form[:is_private]}
+          type="checkbox"
+          label="Private Event"
+        />
+        <.input
+          field={@form[:disabled]}
+          type="checkbox"
+          label="Disabled"
+        />
 
         <:actions>
           <.button
@@ -177,7 +175,13 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
       |> Occurences.change_occurence(occurence_params)
       |> Map.put(:action, :validate)
 
-    {:noreply, assign_form(socket, changeset)}
+    # Apply the changeset to get updated data
+    updated_occurence = Ecto.Changeset.apply_changes(changeset)
+
+    {:noreply,
+     socket
+     |> assign(:occurence, updated_occurence)
+     |> assign_form(changeset)}
   end
 
   def handle_event("save", %{"occurence" => occurence_params}, socket) do

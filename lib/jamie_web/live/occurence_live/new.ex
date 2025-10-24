@@ -26,7 +26,15 @@ defmodule JamieWeb.OccurenceLive.New do
   end
 
   def mount(_params, _session, socket) do
-    {:ok, assign(socket, :occurence, %Occurence{})}
+    occurence = %Occurence{
+      show_available_spots: true,
+      show_partecipant_list: true,
+      is_private: false,
+      disabled: false,
+      status: "scheduled"
+    }
+
+    {:ok, assign(socket, :occurence, occurence)}
   end
 
   def handle_info({JamieWeb.OccurenceLive.FormComponent, {:saved, _occurence}}, socket) do

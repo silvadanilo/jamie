@@ -8,6 +8,12 @@
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <script
+      :if={Application.get_env(:jamie, :google_maps_api_key)}
+      src={"https://maps.googleapis.com/maps/api/js?key=#{Application.get_env(:jamie, :google_maps_api_key)}&libraries=places&loading=async"}
+      async
+    >
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/js/app.js"}>
     </script>
     <script>

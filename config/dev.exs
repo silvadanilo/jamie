@@ -1,5 +1,7 @@
 import Config
 
+config :jamie, google_maps_api_key: System.get_env("GOOGLE_MAPS_API_KEY")
+
 # Configure your database
 config :jamie, Jamie.Repo,
   username: "postgres",
