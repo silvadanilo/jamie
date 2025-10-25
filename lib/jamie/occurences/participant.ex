@@ -30,4 +30,11 @@ defmodule Jamie.Occurences.Participant do
       message: "User is already registered for this event"
     )
   end
+
+  def role_changeset(participant, attrs) do
+    participant
+    |> cast(attrs, [:role])
+    |> validate_required([:role])
+    |> validate_inclusion(:role, @valid_roles)
+  end
 end

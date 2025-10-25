@@ -41,8 +41,11 @@ defmodule Jamie.Occurences.Coorganizer do
 
   defp validate_email_format(changeset) do
     case get_field(changeset, :invited_email) do
-      nil -> changeset
-      _email -> validate_format(changeset, :invited_email, ~r/@/)
+      nil ->
+        changeset
+
+      _email ->
+        validate_format(changeset, :invited_email, ~r/^[^\s]+@[^\s]+$/, message: "must have the @ sign and no spaces")
     end
   end
 

@@ -459,4 +459,66 @@ defmodule Jamie.Occurences do
         |> Repo.update()
     end
   end
+
+  @doc """
+  Creates or gets a user for a participant.
+  """
+  def create_or_get_user_for_participant(attrs) do
+    # Try to find existing user by email first
+    case attrs["email"] do
+      nil ->
+        # If no email provided, create a new user
+        create_user_for_participant(attrs)
+
+      email ->
+        case Repo.get_by(User, email: email) do
+          nil ->
+            # User doesn't exist, create new one
+            create_user_for_participant(attrs)
+
+          user ->
+            # User exists, update with new info if provided
+            user
+            |> User.profile_changeset(attrs)
+            |> Repo.update()
+        end
+    end
+  end
+
+  defp create_user_for_participant(attrs) do
+    # Generate a unique email if not provided
+    email =
+      attrs["email"] || "#{attrs["name"]}.#{attrs["surname"]}.#{System.unique_integer([:positive])}@participant.local"
+
+    user_attrs = Map.put(attrs, "email", email)
+
+    %User{}
+    |> User.registration_changeset(user_attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Creates a changeset for a participant.
+  """
+  def change_participant(%Participant{} = participant, attrs \\ %{}) do
+    Participant.changeset(participant, attrs)
+  end
+
+  @doc """
+  Creates a participant.
+  """
+  def create_participant(attrs \\ %{}) do
+    %Participant{}
+    |> Participant.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a participant's role.
+  """
+  def update_participant_role(participant, role) do
+    participant
+    |> Participant.role_changeset(%{role: role})
+    |> Repo.update()
+  end
 end

@@ -21,6 +21,9 @@ defmodule JamieWeb.TableParticipantRow do
   attr :actions, :list, default: [], doc: "List of action button configurations"
   attr :variant, :string, default: "default", values: ["default", "cancelled"], doc: "The row variant"
   attr :class, :string, default: "", doc: "Additional CSS classes"
+  attr :editing_role, :boolean, default: false, doc: "Whether the role is being edited"
+  attr :on_start_edit_role, :string, default: nil, doc: "Event to start editing role"
+  attr :on_cancel_edit_role, :string, default: nil, doc: "Event to cancel editing role"
 
   def table_participant_row(assigns) do
     ~H"""
@@ -67,13 +70,56 @@ defmodule JamieWeb.TableParticipantRow do
           </div>
         </div>
         <div class="flex items-center gap-4 mb-3">
-          <span class={[
-            "px-3 py-1 text-sm rounded-lg font-medium",
-            @variant == "cancelled" && "bg-base-200 border border-sky-500/30 text-sky-500",
-            @variant != "cancelled" && "bg-sky-500 text-white"
-          ]}>
-            {String.capitalize(@participant.role)}
-          </span>
+          <%= if @editing_role do %>
+            <div class="flex items-center gap-2">
+              <form phx-submit="update_role" class="flex items-center gap-2">
+                <input type="hidden" name="participant_id" value={@participant.id} />
+                <select
+                  name="role"
+                  class="px-3 py-1 text-sm rounded-lg border border-base-300 bg-base-100 text-base-content"
+                >
+                  <option value="base" selected={@participant.role == "base"}>Base</option>
+                  <option value="flyer" selected={@participant.role == "flyer"}>Flyer</option>
+                </select>
+                <button
+                  type="submit"
+                  class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+                  title="Save"
+                >
+                  <.icon name="hero-check" class="h-4 w-4 text-base-content/70" />
+                </button>
+              </form>
+              <button
+                type="button"
+                phx-click={@on_cancel_edit_role}
+                class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+                title="Cancel"
+              >
+                <.icon name="hero-x-mark" class="h-4 w-4 text-base-content/70" />
+              </button>
+            </div>
+          <% else %>
+            <div class="flex items-center gap-2">
+              <span class={[
+                "px-3 py-1 text-sm rounded-lg font-medium",
+                @variant == "cancelled" && "bg-base-200 border border-sky-500/30 text-sky-500",
+                @variant != "cancelled" && "bg-sky-500 text-white"
+              ]}>
+                {String.capitalize(@participant.role)}
+              </span>
+              <%= if @on_start_edit_role && @variant != "cancelled" do %>
+                <button
+                  type="button"
+                  phx-click={@on_start_edit_role}
+                  phx-value-id={@participant.id}
+                  class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+                  title="Edit role"
+                >
+                  <.icon name="hero-pencil" class="h-4 w-4 text-base-content/70" />
+                </button>
+              <% end %>
+            </div>
+          <% end %>
           <span class={[
             "text-sm",
             @variant == "cancelled" && "text-base-content/60",
@@ -83,7 +129,7 @@ defmodule JamieWeb.TableParticipantRow do
           </span>
         </div>
       </div>
-      
+
     <!-- Desktop Layout - Table Structure -->
       <div class="hidden md:grid grid-cols-[2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center">
         <div class={[
@@ -99,13 +145,56 @@ defmodule JamieWeb.TableParticipantRow do
           {@participant.user.phone || "—"}
         </div>
         <div>
-          <span class={[
-            "px-3 py-1 text-sm rounded-lg font-medium",
-            @variant == "cancelled" && "bg-base-200 border border-sky-500/30 text-sky-500",
-            @variant != "cancelled" && "bg-sky-500 text-white"
-          ]}>
-            {String.capitalize(@participant.role)}
-          </span>
+          <%= if @editing_role do %>
+            <div class="flex items-center gap-2">
+              <form phx-submit="update_role" class="flex items-center gap-2">
+                <input type="hidden" name="participant_id" value={@participant.id} />
+                <select
+                  name="role"
+                  class="px-3 py-1 text-sm rounded-lg border border-base-300 bg-base-100 text-base-content"
+                >
+                  <option value="base" selected={@participant.role == "base"}>Base</option>
+                  <option value="flyer" selected={@participant.role == "flyer"}>Flyer</option>
+                </select>
+                <button
+                  type="submit"
+                  class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+                  title="Save"
+                >
+                  <.icon name="hero-check" class="h-4 w-4 text-base-content/70" />
+                </button>
+              </form>
+              <button
+                type="button"
+                phx-click={@on_cancel_edit_role}
+                class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+                title="Cancel"
+              >
+                <.icon name="hero-x-mark" class="h-4 w-4 text-base-content/70" />
+              </button>
+            </div>
+          <% else %>
+            <div class="flex items-center gap-2">
+              <span class={[
+                "px-3 py-1 text-sm rounded-lg font-medium",
+                @variant == "cancelled" && "bg-base-200 border border-sky-500/30 text-sky-500",
+                @variant != "cancelled" && "bg-sky-500 text-white"
+              ]}>
+                {String.capitalize(@participant.role)}
+              </span>
+              <%= if @on_start_edit_role && @variant != "cancelled" do %>
+                <button
+                  type="button"
+                  phx-click={@on_start_edit_role}
+                  phx-value-id={@participant.id}
+                  class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+                  title="Edit role"
+                >
+                  <.icon name="hero-pencil" class="h-4 w-4 text-base-content/70" />
+                </button>
+              <% end %>
+            </div>
+          <% end %>
         </div>
         <div class={[
           @variant == "cancelled" && "text-base-content/60",
