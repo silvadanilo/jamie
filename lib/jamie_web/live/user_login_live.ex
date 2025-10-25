@@ -12,7 +12,7 @@ defmodule JamieWeb.UserLoginLive do
               <span class="block mt-3 text-base sm:text-sm">
                 Don't have an account?
                 <.link
-                  navigate={~p"/register"}
+                  navigate={if @return_to, do: ~p"/register?#{%{return_to: @return_to}}", else: ~p"/register"}
                   class="font-semibold text-primary hover:text-primary-focus underline"
                 >
                   Sign up
@@ -32,7 +32,7 @@ defmodule JamieWeb.UserLoginLive do
               phx-submit="login"
               phx-change="validate"
               phx-trigger-action={@trigger_submit}
-              action={~p"/login"}
+              action={if @return_to, do: ~p"/login?#{%{return_to: @return_to}}", else: ~p"/login"}
               method="post"
             >
               <.input
@@ -96,16 +96,20 @@ defmodule JamieWeb.UserLoginLive do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     email = Phoenix.Flash.get(socket.assigns.flash, :email)
     error_message = Phoenix.Flash.get(socket.assigns.flash, :error)
     form = to_form(%{"email" => email, "password" => "", "remember_me" => "false"}, as: "user")
+
+    # Store return_to in socket assigns for later use
+    return_to = params["return_to"]
 
     {:ok,
      assign(socket,
        form: form,
        error_message: error_message,
-       trigger_submit: false
+       trigger_submit: false,
+       return_to: return_to
      )}
   end
 

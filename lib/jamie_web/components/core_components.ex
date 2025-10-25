@@ -95,12 +95,9 @@ defmodule JamieWeb.CoreComponents do
 
   def button(%{rest: rest} = assigns) do
     variants = %{
-      "primary" =>
-        "btn-primary shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold",
-      "secondary" =>
-        "btn-secondary shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200",
-      nil =>
-        "btn-primary shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold"
+      "primary" => "btn-primary shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold",
+      "secondary" => "btn-secondary shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200",
+      nil => "btn-primary shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 font-semibold"
     }
 
     variant_classes = Map.fetch!(variants, assigns[:variant])
@@ -160,8 +157,7 @@ defmodule JamieWeb.CoreComponents do
     values: ~w(checkbox color date datetime-local email file month number password
                search select tel text textarea time url week)
 
-  attr :field, Phoenix.HTML.FormField,
-    doc: "a form field struct retrieved from the form, for example: @form[:email]"
+  attr :field, Phoenix.HTML.FormField, doc: "a form field struct retrieved from the form, for example: @form[:email]"
 
   attr :errors, :list, default: []
   attr :checked, :boolean, doc: "the checked flag for checkbox inputs"
@@ -171,8 +167,7 @@ defmodule JamieWeb.CoreComponents do
   attr :class, :string, default: nil, doc: "the input class to use over defaults"
   attr :error_class, :string, default: nil, doc: "the input error class to use over defaults"
 
-  attr :rest, :global,
-    include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
+  attr :rest, :global, include: ~w(accept autocomplete capture cols disabled form list max maxlength min minlength
                 multiple pattern placeholder readonly required rows size step)
 
   def input(%{field: %Phoenix.HTML.FormField{} = field} = assigns) do
@@ -319,6 +314,7 @@ defmodule JamieWeb.CoreComponents do
         <span :if={@label} class="label text-base select-none flex-1">
           {@label}
         </span>
+        <input type="hidden" name={@name} value="false" />
         <input
           type="checkbox"
           id={@id}
@@ -522,8 +518,7 @@ defmodule JamieWeb.CoreComponents do
       to: selector,
       time: 300,
       transition:
-        {"transition-all ease-out duration-300",
-         "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
+        {"transition-all ease-out duration-300", "opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95",
          "opacity-100 translate-y-0 sm:scale-100"}
     )
   end

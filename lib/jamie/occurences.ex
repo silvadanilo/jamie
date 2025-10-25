@@ -7,6 +7,8 @@ defmodule Jamie.Occurences do
   alias Jamie.Repo
 
   alias Jamie.Occurences.Occurence
+  alias Jamie.Occurences.Coorganizer
+  alias Jamie.Accounts.User
 
   @doc """
   Returns the list of occurences for a given user.
@@ -54,12 +56,39 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
-  Creates a occurence.
+  Creates a occurence and automatically adds the creator as a coorganizer.
   """
   def create_occurence(attrs \\ %{}) do
-    %Occurence{}
-    |> Occurence.changeset(attrs)
+    Repo.transaction(fn ->
+      with {:ok, occurence} <- store_occurence(attrs),
+           {:ok, _coorganizer} <- store_creator_as_coorganizer(occurence) do
+        occurence
+      else
+        {:error, changeset} -> Repo.rollback(changeset)
+      end
+    end)
+  end
+
+  defp store_occurence(attrs) do
+    %Occurence{} |> Occurence.changeset(attrs) |> Repo.insert()
+  end
+
+  defp store_creator_as_coorganizer(occurence) do
+    creator_email = get_creator_email(occurence.created_by_id)
+
+    %Coorganizer{}
+    |> Coorganizer.changeset(%{
+      occurence_id: occurence.id,
+      user_id: occurence.created_by_id,
+      accepted_at: DateTime.utc_now() |> DateTime.truncate(:second),
+      is_creator: true
+    })
     |> Repo.insert()
+  end
+
+  defp get_creator_email(user_id) do
+    user = Repo.get!(User, user_id)
+    user.email
   end
 
   @doc """
@@ -86,13 +115,6 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
-  Checks if the user can manage the occurence (is creator or superadmin).
-  """
-  def can_manage_occurence?(%Occurence{} = occurence, user) do
-    user.role == "superadmin" or occurence.created_by_id == user.id
-  end
-
-  @doc """
   Updates the status of an occurence.
   """
   def update_occurence_status(%Occurence{} = occurence, status)
@@ -108,30 +130,182 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
-  Returns upcoming occurences for a user.
+  Returns upcoming occurences for a user (where they're the creator or a coorganizer).
+  Sorted from nearest to farthest.
   """
   def list_upcoming_occurences(user) do
     now = DateTime.utc_now()
 
-    Occurence
-    |> where([o], o.created_by_id == ^user.id)
-    |> where([o], o.date >= ^now)
-    |> where([o], o.status == "scheduled")
-    |> where([o], o.disabled == false)
-    |> order_by([o], asc: o.date)
+    from(o in Occurence,
+      join: c in Coorganizer,
+      on: c.occurence_id == o.id,
+      where: c.user_id == ^user.id,
+      where: not is_nil(c.accepted_at),
+      where: o.date >= ^now,
+      order_by: [asc: o.date]
+    )
     |> Repo.all()
   end
 
   @doc """
-  Returns past occurences for a user.
+  Returns past occurences for a user (where they're the creator or a coorganizer).
+  Sorted from most recent to oldest.
   """
   def list_past_occurences(user) do
     now = DateTime.utc_now()
 
-    Occurence
-    |> where([o], o.created_by_id == ^user.id)
-    |> where([o], o.date < ^now or o.status in ["cancelled", "completed"])
-    |> order_by([o], desc: o.date)
+    from(o in Occurence,
+      join: c in Coorganizer,
+      on: c.occurence_id == o.id,
+      where: c.user_id == ^user.id,
+      where: not is_nil(c.accepted_at),
+      where: o.date < ^now,
+      order_by: [desc: o.date]
+    )
     |> Repo.all()
+  end
+
+  @doc """
+  Invites a co-organizer by email.
+  """
+  def invite_coorganizer(occurence_id, invited_email, invited_by_user) do
+    occurence = get_occurence!(occurence_id)
+
+    case Repo.get_by(User, email: invited_email) do
+      nil ->
+        create_pending_invitation(occurence, invited_email, invited_by_user)
+
+      existing_user ->
+        create_accepted_invitation(occurence, existing_user, invited_by_user)
+    end
+  end
+
+  defp create_pending_invitation(occurence, invited_email, invited_by_user) do
+    attrs = %{
+      occurence_id: occurence.id,
+      invited_email: invited_email,
+      invited_by_id: invited_by_user.id
+    }
+
+    result =
+      %Coorganizer{}
+      |> Coorganizer.invite_changeset(attrs)
+      |> Repo.insert()
+
+    case result do
+      {:ok, coorganizer} ->
+        token_url = build_invitation_url(coorganizer.invite_token)
+
+        Jamie.Occurences.Notifier.deliver_coorganizer_invitation_new_user(
+          coorganizer,
+          occurence,
+          invited_by_user,
+          token_url
+        )
+
+        {:ok, coorganizer}
+
+      error ->
+        error
+    end
+  end
+
+  defp create_accepted_invitation(occurence, existing_user, invited_by_user) do
+    attrs = %{
+      occurence_id: occurence.id,
+      invited_email: existing_user.email,
+      user_id: existing_user.id,
+      invited_by_id: invited_by_user.id,
+      accepted_at: DateTime.utc_now() |> DateTime.truncate(:second)
+    }
+
+    result =
+      %Coorganizer{}
+      |> Coorganizer.changeset(attrs)
+      |> Repo.insert()
+
+    case result do
+      {:ok, coorganizer} ->
+        Jamie.Occurences.Notifier.deliver_coorganizer_invitation_existing_user(
+          coorganizer,
+          occurence,
+          invited_by_user
+        )
+
+        {:ok, coorganizer}
+
+      error ->
+        error
+    end
+  end
+
+  defp build_invitation_url(token) do
+    JamieWeb.Endpoint.url() <> "/coorganizer-invite/#{token}"
+  end
+
+  @doc """
+  Gets a coorganizer invitation by token.
+  """
+  def get_coorganizer_by_token(token) do
+    Repo.get_by(Coorganizer, invite_token: token)
+  end
+
+  @doc """
+  Accepts a co-organizer invitation.
+  """
+  def accept_coorganizer_invitation(%Coorganizer{} = coorganizer, user_id) do
+    if Coorganizer.token_valid?(coorganizer) do
+      coorganizer
+      |> Coorganizer.accept_changeset(user_id)
+      |> Repo.update()
+    else
+      {:error, :token_expired}
+    end
+  end
+
+  @doc """
+  Lists all co-organizers for an occurence.
+  """
+  def list_coorganizers(occurence_id) do
+    Coorganizer
+    |> where([c], c.occurence_id == ^occurence_id)
+    |> preload([:user, :invited_by])
+    |> Repo.all()
+  end
+
+  @doc """
+  Removes a co-organizer.
+  """
+  def remove_coorganizer(%Coorganizer{} = coorganizer) do
+    Repo.delete(coorganizer)
+  end
+
+  @doc """
+  Checks if the user can manage the occurence (is creator, co-organizer, or superadmin).
+  """
+  def can_manage_occurence?(%Occurence{} = occurence, user) do
+    user.role == "superadmin" or is_coorganizer?(occurence.id, user.id)
+  end
+
+  @doc """
+  Checks if a user is a co-organizer of an occurence (including creator).
+  """
+  def is_coorganizer?(occurence_id, user_id) do
+    Coorganizer
+    |> where([c], c.occurence_id == ^occurence_id)
+    |> where([c], c.user_id == ^user_id)
+    |> where([c], not is_nil(c.accepted_at))
+    |> Repo.exists?()
+  end
+
+  @doc """
+  Checks if a user is the creator of an occurence.
+  """
+  def is_creator?(occurence_id, user_id) do
+    Coorganizer
+    |> where([c], c.occurence_id == ^occurence_id)
+    |> where([c], c.user_id == ^user_id)
+    |> where([c], c.is_creator == true)
+    |> Repo.exists?()
   end
 end

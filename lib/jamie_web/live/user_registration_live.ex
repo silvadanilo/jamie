@@ -19,7 +19,7 @@ defmodule JamieWeb.UserRegistrationLive do
                   <div class="mt-3 text-base sm:text-lg text-base-content/70">
                     Already registered?
                     <.link
-                      navigate={~p"/login"}
+                      navigate={if @return_to, do: ~p"/login?#{%{return_to: @return_to}}", else: ~p"/login"}
                       class="font-semibold text-primary hover:text-primary-focus underline underline-offset-2"
                     >
                       Sign in
@@ -34,7 +34,11 @@ defmodule JamieWeb.UserRegistrationLive do
                 phx-submit="save"
                 phx-change="validate"
                 phx-trigger-action={@trigger_submit}
-                action={~p"/login?_action=registered"}
+                action={
+                  if @return_to,
+                    do: ~p"/login?#{%{_action: "registered", return_to: @return_to}}",
+                    else: ~p"/login?_action=registered"
+                }
                 method="post"
               >
                 <.error :if={@check_errors}>
@@ -98,12 +102,14 @@ defmodule JamieWeb.UserRegistrationLive do
     """
   end
 
-  def mount(_params, _session, socket) do
+  def mount(params, _session, socket) do
     changeset = Accounts.change_user_registration(%User{})
+
+    return_to = params["return_to"]
 
     socket =
       socket
-      |> assign(trigger_submit: false, check_errors: false)
+      |> assign(trigger_submit: false, check_errors: false, return_to: return_to)
       |> assign_form(changeset)
 
     {:ok, socket, temporary_assigns: [form: nil]}

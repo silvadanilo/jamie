@@ -4,13 +4,28 @@ defmodule JamieWeb.UserSessionController do
   alias Jamie.Accounts
   alias JamieWeb.UserAuth
 
-  def create(conn, %{"_action" => "registered"} = _params) do
+  def create(conn, %{"_action" => "registered"} = params) do
+    # Store return_to if provided so it persists after registration
+    conn =
+      if return_to = params["return_to"] do
+        put_session(conn, :user_return_to, return_to)
+      else
+        conn
+      end
+
+    redirect_path =
+      if return_to = params["return_to"] do
+        ~p"/login?#{%{return_to: return_to}}"
+      else
+        ~p"/login"
+      end
+
     conn
     |> put_flash(
       :info,
       "Account created successfully! Check your email for a magic link to sign in."
     )
-    |> redirect(to: ~p"/login")
+    |> redirect(to: redirect_path)
   end
 
   def create(conn, %{"_action" => "password_updated"} = params) do
@@ -20,6 +35,14 @@ defmodule JamieWeb.UserSessionController do
   end
 
   def create(conn, params) do
+    # Store return_to if provided
+    conn =
+      if return_to = params["return_to"] do
+        put_session(conn, :user_return_to, return_to)
+      else
+        conn
+      end
+
     create(conn, params, "Welcome back!")
   end
 

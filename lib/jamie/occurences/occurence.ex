@@ -31,6 +31,7 @@ defmodule Jamie.Occurences.Occurence do
     field :is_private, :boolean, default: false
 
     belongs_to :created_by, Jamie.Accounts.User
+    has_many :coorganizers, Jamie.Occurences.Coorganizer
 
     timestamps(type: :utc_datetime)
   end
