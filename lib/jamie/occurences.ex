@@ -33,15 +33,31 @@ defmodule Jamie.Occurences do
   @doc """
   Returns the list of upcoming public occurences.
   Sorted from nearest to farthest.
+  Optionally filters by search term (title or location).
   """
-  def list_public_occurences do
+  def list_public_occurences(search \\ nil) do
     now = DateTime.utc_now()
 
-    Occurence
-    |> where([o], o.is_private == false and o.disabled == false)
-    |> where([o], o.date >= ^now)
-    |> order_by([o], asc: o.date)
-    |> Repo.all()
+    query =
+      Occurence
+      |> where([o], o.is_private == false and o.disabled == false)
+      |> where([o], o.date >= ^now)
+      |> order_by([o], asc: o.date)
+
+    query =
+      if search && search != "" do
+        search_pattern = "%#{search}%"
+
+        where(
+          query,
+          [o],
+          ilike(o.title, ^search_pattern) or ilike(o.location, ^search_pattern)
+        )
+      else
+        query
+      end
+
+    Repo.all(query)
   end
 
   @doc """

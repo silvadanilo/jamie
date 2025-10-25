@@ -103,6 +103,7 @@ defmodule Jamie.MixProject do
             Mix.shell().info("Copied #{file} to priv/static/images/")
           end
         end)
+
       {:error, :enoent} ->
         Mix.shell().info("No assets/images directory found, skipping image copy")
     end

@@ -43,11 +43,16 @@ defmodule Jamie.Occurences.Participant do
   defp validate_email_or_phone(changeset) do
     email = get_field(changeset, :email)
     phone = get_field(changeset, :phone)
+    user_id = get_field(changeset, :user_id)
 
-    if is_nil(email) and is_nil(phone) do
-      add_error(changeset, :email, "Either email or phone must be provided")
-    else
+    if user_id do
       changeset
+    else
+      if is_nil(email) and is_nil(phone) do
+        add_error(changeset, :email, "Either email or phone must be provided")
+      else
+        changeset
+      end
     end
   end
 

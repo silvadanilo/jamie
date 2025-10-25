@@ -23,6 +23,7 @@ defmodule JamieWeb.Router do
     live_session :public,
       on_mount: [{JamieWeb.UserAuth, :mount_current_user}] do
       live "/", HomeLive, :index
+      live "/events", EventsLive, :index
       live "/events/:slug", OccurenceLive.Show, :show
     end
   end

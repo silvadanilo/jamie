@@ -713,5 +713,4 @@ defmodule JamieWeb.OccurenceLive.Participants do
         {:noreply, put_flash(socket, :error, "Failed to update participant role")}
     end
   end
-
 end
