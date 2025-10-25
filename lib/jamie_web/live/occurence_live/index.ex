@@ -33,63 +33,54 @@ defmodule JamieWeb.OccurenceLive.Index do
                   </p>
                 </div>
               <% else %>
-                <div class="grid gap-4">
+                <div class="grid gap-3">
                   <div
                     :for={occurence <- @upcoming_occurences}
-                    class="card bg-base-200 shadow-md hover:shadow-lg transition-shadow"
+                    class="bg-base-200 rounded-2xl p-4 hover:bg-base-300 transition-colors"
                   >
-                    <div class="card-body">
-                      <div class="flex justify-between items-start gap-4">
-                        <div class="flex-1">
-                          <h3 class="card-title text-lg sm:text-xl">{occurence.title}</h3>
-                          <div class="mt-2 space-y-1 text-sm text-base-content/70">
-                            <div class="flex items-center gap-2">
-                              <.icon name="hero-calendar" class="h-4 w-4" />
-                              <span>
-                                {Calendar.strftime(occurence.date, "%B %d, %Y at %I:%M %p")}
-                              </span>
-                            </div>
-                            <div :if={occurence.location} class="flex items-center gap-2">
-                              <.icon name="hero-map-pin" class="h-4 w-4" />
-                              <span>{occurence.location}</span>
-                            </div>
-                            <div :if={occurence.cost} class="flex items-center gap-2">
-                              <.icon name="hero-currency-dollar" class="h-4 w-4" />
-                              <span>€{occurence.cost}</span>
-                            </div>
-                          </div>
-                          <div class="mt-3 flex flex-wrap gap-2">
-                            <span class="badge badge-success">{occurence.status}</span>
-                            <span :if={occurence.disabled} class="badge badge-warning">Disabled</span>
-                            <span :if={occurence.is_private} class="badge badge-info">Private</span>
-                          </div>
+                    <div class="flex items-center gap-4">
+                      <div class="flex-shrink-0">
+                        <div class="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center">
+                          <.icon name="hero-calendar-days" class="h-6 w-6 text-primary" />
                         </div>
-                        <div class="flex flex-col gap-2">
-                          <.link
-                            navigate={~p"/occurences/#{occurence.id}/edit"}
-                            class="btn btn-sm btn-ghost"
-                            title="Edit event"
-                          >
-                            <.icon name="hero-pencil" class="h-4 w-4" />
-                          </.link>
-                          <.link
-                            navigate={~p"/occurences/#{occurence.id}/coorganizers"}
-                            class="btn btn-sm btn-ghost"
-                            title="Manage co-organizers"
-                          >
-                            <.icon name="hero-users" class="h-4 w-4" />
-                          </.link>
-                          <button
-                            type="button"
-                            phx-click="delete"
-                            phx-value-id={occurence.id}
-                            data-confirm="Are you sure you want to delete this event?"
-                            class="btn btn-sm btn-ghost text-error"
-                            title="Delete event"
-                          >
-                            <.icon name="hero-trash" class="h-4 w-4" />
-                          </button>
+                      </div>
+                      
+                      <div class="flex-1 min-w-0">
+                        <h3 class="text-lg font-semibold truncate">{occurence.title}</h3>
+                        <div class="flex items-center gap-3 text-sm text-base-content/60 mt-1">
+                          <span class="flex items-center gap-1">
+                            <.icon name="hero-clock" class="h-3.5 w-3.5" />
+                            {Calendar.strftime(occurence.date, "%b %d, %Y · %I:%M %p")}
+                          </span>
+                          <span :if={occurence.location} class="flex items-center gap-1 truncate">
+                            <.icon name="hero-map-pin" class="h-3.5 w-3.5" />
+                            {occurence.location}
+                          </span>
                         </div>
+                      </div>
+                      
+                      <div class="flex items-center gap-2">
+                        <.link
+                          navigate={~p"/occurences/#{occurence.id}/edit"}
+                          class="btn btn-sm h-11 px-4 border-2 border-base-content/20 hover:border-base-content/40 bg-transparent hover:bg-base-content/5"
+                        >
+                          <.icon name="hero-pencil" class="h-5 w-5" />
+                        </.link>
+                        <.link
+                          navigate={~p"/occurences/#{occurence.id}/coorganizers"}
+                          class="btn btn-sm h-11 px-4 border-2 border-base-content/20 hover:border-base-content/40 bg-transparent hover:bg-base-content/5"
+                        >
+                          <.icon name="hero-users" class="h-5 w-5" />
+                        </.link>
+                        <button
+                          type="button"
+                          phx-click="delete"
+                          phx-value-id={occurence.id}
+                          data-confirm="Are you sure you want to delete this event?"
+                          class="btn btn-sm h-11 px-4 border-2 border-error/50 hover:border-error text-error hover:bg-error/10 bg-transparent"
+                        >
+                          <.icon name="hero-trash" class="h-5 w-5" />
+                        </button>
                       </div>
                     </div>
                   </div>
