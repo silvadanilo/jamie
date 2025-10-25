@@ -54,7 +54,7 @@ defmodule JamieWeb.CoorganizerInviteLive do
         {:noreply,
          socket
          |> put_flash(:info, "Invitation accepted! You are now a co-organizer.")
-         |> push_navigate(to: ~p"/occurences")}
+         |> push_navigate(to: ~p"/organizer/occurences")}
 
       {:error, :token_expired} ->
         {:noreply,

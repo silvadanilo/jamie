@@ -14,8 +14,8 @@ defmodule JamieWeb.EventCard do
         occurence={@occurence}
         show_actions={true}
         actions={[
-          %{type: :edit, path: ~p"/occurences/123/edit", icon: "hero-pencil"},
-          %{type: :participants, path: ~p"/occurences/123/participants", icon: "hero-user-group"}
+          %{type: :edit, path: ~p"/organizer/occurences/123/edit", icon: "hero-pencil"},
+          %{type: :participants, path: ~p"/organizer/occurences/123/participants", icon: "hero-user-group"}
         ]}
       />
   """

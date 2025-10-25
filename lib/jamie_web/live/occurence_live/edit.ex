@@ -13,7 +13,7 @@ defmodule JamieWeb.OccurenceLive.Edit do
       socket =
         socket
         |> put_flash(:error, "You are not authorized to edit this event")
-        |> push_navigate(to: ~p"/occurences")
+        |> push_navigate(to: ~p"/organizer/occurences")
 
       {:ok, socket}
     end

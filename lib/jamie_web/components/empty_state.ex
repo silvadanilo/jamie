@@ -14,7 +14,7 @@ defmodule JamieWeb.EmptyState do
         icon="hero-calendar-days"
         title="No upcoming events"
         description="Create your first event to get started"
-        action={%{label: "Create Event", path: ~p"/occurences/new"}}
+        action={%{label: "Create Event", path: ~p"/organizer/occurences/new"}}
       />
 
       <.empty_state

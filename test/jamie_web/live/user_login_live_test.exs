@@ -107,7 +107,7 @@ defmodule JamieWeb.UserLoginLiveTest do
     end
   end
 
-  defp user_with_password_fixture(attrs \\ %{}) do
+  defp user_with_password_fixture(attrs) do
     password = Map.get(attrs, :password, "password123456")
 
     user = user_fixture()

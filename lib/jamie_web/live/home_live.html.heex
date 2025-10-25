@@ -13,13 +13,13 @@
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <%= if @current_user do %>
               <.link
-                navigate={~p"/occurences"}
+                navigate={~p"/organizer/occurences"}
                 class="btn btn-primary btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
               >
                 <.icon name="hero-calendar" class="h-5 w-5" /> My Events
               </.link>
               <.link
-                navigate={~p"/occurences/new"}
+                navigate={~p"/organizer/occurences/new"}
                 class="btn btn-secondary btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
               >
                 <.icon name="hero-plus" class="h-5 w-5" /> Create Event

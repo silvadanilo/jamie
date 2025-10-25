@@ -9,7 +9,7 @@
           action={:edit}
           occurence={@occurence}
           current_user={@current_user}
-          navigate={~p"/occurences"}
+          navigate={~p"/organizer/occurences"}
         />
       </div>
 
@@ -20,7 +20,7 @@
             <p class="text-sm text-base-content/70 mt-1">Manage who can help organize this event</p>
           </div>
           <.link
-            navigate={~p"/occurences/#{@occurence.id}/coorganizers"}
+            navigate={~p"/organizer/occurences/#{@occurence.id}/coorganizers"}
             class="btn btn-primary"
           >
             <.icon name="hero-users" class="h-5 w-5" /> Manage Co-organizers

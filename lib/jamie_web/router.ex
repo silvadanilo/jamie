@@ -46,14 +46,21 @@ defmodule JamieWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{JamieWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
+      live "/events/:slug/register", OccurenceLive.Register, :register
+    end
+  end
 
+  scope "/organizer", JamieWeb do
+    pipe_through [:browser, :require_authenticated_user]
+
+    live_session :organizer,
+      on_mount: [{JamieWeb.UserAuth, :ensure_authenticated}] do
       live "/occurences", OccurenceLive.Index, :index
       live "/occurences/new", OccurenceLive.New, :new
       live "/occurences/:id/edit", OccurenceLive.Edit, :edit
       live "/occurences/:id/coorganizers", OccurenceLive.Coorganizers, :index
       live "/occurences/:id/participants", OccurenceLive.Participants, :index
       live "/occurences/:id/participants/new", OccurenceLive.Participants, :new
-      live "/events/:slug/register", OccurenceLive.Register, :register
     end
   end
 

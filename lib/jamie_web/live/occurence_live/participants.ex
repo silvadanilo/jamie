@@ -22,7 +22,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
             <div class="max-w-2xl mx-auto">
               <div class="mb-8">
                 <.link
-                  navigate={~p"/occurences/#{@occurence.id}/participants"}
+                  navigate={~p"/organizer/occurences/#{@occurence.id}/participants"}
                   class="text-base-content/70 hover:text-base-content text-sm mb-4 inline-flex items-center gap-2"
                 >
                   <.icon name="hero-arrow-left" class="h-4 w-4" /> Back to Participants
@@ -102,7 +102,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
 
                   <div class="flex justify-end gap-4 pt-6">
                     <.link
-                      navigate={~p"/occurences/#{@occurence.id}/participants"}
+                      navigate={~p"/organizer/occurences/#{@occurence.id}/participants"}
                       class="btn btn-ghost"
                     >
                       Cancel
@@ -133,12 +133,12 @@ defmodule JamieWeb.OccurenceLive.Participants do
                     {Calendar.strftime(@occurence.date, "%B %d, %Y at %I:%M %p")} • {@occurence.location || "Location TBD"}
                   </:subtitle>
                   <:actions>
-                    <.link navigate={~p"/occurences/#{@occurence.id}/participants/new"}>
+                    <.link navigate={~p"/organizer/occurences/#{@occurence.id}/participants/new"}>
                       <.button>
                         <.icon name="hero-plus" class="w-5 h-5" /> Add Participant
                       </.button>
                     </.link>
-                    <.link navigate={~p"/occurences"}>
+                    <.link navigate={~p"/organizer/occurences"}>
                       <.button class="btn-ghost btn-sm">
                         <.icon name="hero-arrow-left" class="w-4 h-4" /> Back
                       </.button>
@@ -395,7 +395,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
       socket =
         socket
         |> put_flash(:error, "You are not authorized to add participants for this event")
-        |> push_navigate(to: ~p"/occurences")
+        |> push_navigate(to: ~p"/organizer/occurences")
 
       {:ok, socket}
     end
@@ -444,7 +444,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
       socket =
         socket
         |> put_flash(:error, "You are not authorized to view participants for this event")
-        |> push_navigate(to: ~p"/occurences")
+        |> push_navigate(to: ~p"/organizer/occurences")
 
       {:ok, socket}
     end
@@ -652,7 +652,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
         socket =
           socket
           |> put_flash(:info, "Participant added successfully")
-          |> push_navigate(to: ~p"/occurences/#{occurence.id}/participants")
+          |> push_navigate(to: ~p"/organizer/occurences/#{occurence.id}/participants")
 
         {:noreply, socket}
 

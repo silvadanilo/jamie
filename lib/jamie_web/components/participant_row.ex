@@ -5,21 +5,6 @@ defmodule JamieWeb.ParticipantRow do
   use Phoenix.Component
   import JamieWeb.CoreComponents
 
-  @doc """
-  Renders a participant row with name, phone, role, date, and actions.
-
-  ## Examples
-
-      <.participant_row
-        participant={participant}
-        index={index}
-        show_position={true}
-        actions={[
-          %{type: :delete, event: "delete", id: participant.id, icon: "hero-x-mark", color: "red"},
-          %{type: :promote, event: "promote_from_waitlist", id: participant.id, icon: "hero-arrow-up", color: "teal"}
-        ]}
-      />
-  """
   attr :participant, :map, required: true, doc: "The participant data"
   attr :index, :integer, doc: "The position/index for waitlist participants"
   attr :show_position, :boolean, default: false, doc: "Whether to show position number"
@@ -128,7 +113,7 @@ defmodule JamieWeb.ParticipantRow do
           </span>
         </div>
       </div>
-      
+
     <!-- Desktop Layout -->
       <div class="hidden md:grid gap-4 items-center" style={grid_columns(@show_position)}>
         <div :if={@show_position} class="text-orange-500 font-bold text-xl">#{@index}</div>

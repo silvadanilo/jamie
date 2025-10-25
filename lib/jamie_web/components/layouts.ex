@@ -51,7 +51,7 @@ defmodule JamieWeb.Layouts do
           </li>
           <%= if @current_scope do %>
             <li class="hidden sm:block">
-              <.link navigate={~p"/occurences"} class="btn btn-ghost btn-sm">
+              <.link navigate={~p"/organizer/occurences"} class="btn btn-ghost btn-sm">
                 <.icon name="hero-calendar" class="h-4 w-4" /> My Events
               </.link>
             </li>
@@ -74,7 +74,7 @@ defmodule JamieWeb.Layouts do
                   <span class="text-xs truncate">{@current_scope.email}</span>
                 </li>
                 <li class="sm:hidden">
-                  <.link navigate={~p"/occurences"}>
+                  <.link navigate={~p"/organizer/occurences"}>
                     <.icon name="hero-calendar" class="h-4 w-4" /> My Events
                   </.link>
                 </li>
