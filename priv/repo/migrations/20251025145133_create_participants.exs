@@ -4,8 +4,10 @@ defmodule Jamie.Repo.Migrations.CreateParticipants do
   def change do
     create table(:participants, primary_key: false) do
       add :id, :binary_id, primary_key: true
+
       add :occurence_id, references(:occurences, on_delete: :delete_all, type: :binary_id),
         null: false
+
       add :user_id, references(:users, on_delete: :delete_all, type: :binary_id), null: false
       add :status, :string, null: false, default: "confirmed"
       add :role, :string, null: false, default: "base"

@@ -26,6 +26,9 @@ defmodule JamieWeb.HomeLiveTest do
     end
 
     test "shows empty state when no public occurences", %{conn: conn} do
+      # Clear all occurrences for this test
+      Jamie.Repo.delete_all(Jamie.Occurences.Occurence)
+
       {:ok, _lv, html} = live(conn, ~p"/")
 
       assert html =~ "Welcome to Jamie"

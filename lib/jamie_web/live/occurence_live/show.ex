@@ -22,8 +22,7 @@ defmodule JamieWeb.OccurenceLive.Show do
                 <div class="absolute inset-0 bg-gradient-to-t from-base-100/50 to-transparent"></div>
               </div>
             <% else %>
-              <div class="h-48 sm:h-64 bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
-              </div>
+              <div class="h-48 sm:h-64 bg-gradient-to-r from-primary to-secondary flex items-center justify-center"></div>
             <% end %>
 
             <%!-- Content --%>
@@ -39,8 +38,7 @@ defmodule JamieWeb.OccurenceLive.Show do
                     :if={!@occurence.cost || Decimal.compare(@occurence.cost, Decimal.new(0)) != :gt}
                     class="badge badge-lg badge-success gap-1"
                   >
-                    <.icon name="hero-currency-euro" class="h-4 w-4" />
-                    Free
+                    <.icon name="hero-currency-euro" class="h-4 w-4" /> Free
                   </span>
                 </div>
               </div>
@@ -76,8 +74,7 @@ defmodule JamieWeb.OccurenceLive.Show do
                       rel="noopener noreferrer"
                       class="text-sm text-primary hover:underline flex items-center gap-1 mt-1"
                     >
-                      <.icon name="hero-map" class="h-4 w-4" />
-                      View on Maps
+                      <.icon name="hero-map" class="h-4 w-4" /> View on Maps
                     </a>
                   </div>
                 </div>
@@ -94,16 +91,44 @@ defmodule JamieWeb.OccurenceLive.Show do
                   </div>
                 <% end %>
 
-                <div :if={@occurence.show_available_spots && @occurence.base_capacity} class="flex items-start gap-3 p-4 bg-base-200 rounded-xl">
-                  <div class="flex-shrink-0">
-                    <.icon name="hero-user-group" class="h-6 w-6 text-primary" />
+                <div :if={@occurence.show_available_spots && @occurence.base_capacity} class="p-4 bg-base-200 rounded-xl">
+                  <div class="text-sm text-base-content/70 mb-4 flex items-center gap-2">
+                    <.icon name="hero-user-group" class="h-5 w-5 text-primary" /> Available Spots
                   </div>
-                  <div>
-                    <div class="text-sm text-base-content/70">Available Spots</div>
-                    <div class="font-semibold">{@occurence.base_capacity} spots</div>
-                    <div :if={@occurence.flyer_capacity} class="text-sm text-base-content/60">
-                      + {@occurence.flyer_capacity} flyer spots
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <%!-- Base Section --%>
+                    <div class="flex flex-col items-center">
+                      <div class="text-white font-bold text-sm mb-1">Base</div>
+                      <% base_available = @occurence.base_capacity - @base_count %>
+                      <div class={[
+                        "px-4 py-2 rounded-lg font-bold text-white text-center min-w-[100px] text-sm",
+                        cond do
+                          base_available == 0 -> "bg-red-500"
+                          base_available < 3 -> "bg-yellow-500"
+                          true -> "bg-teal-500"
+                        end
+                      ]}>
+                        {base_available} / {@occurence.base_capacity}
+                      </div>
                     </div>
+
+                    <%!-- Flyer Section --%>
+                    <%= if @occurence.flyer_capacity do %>
+                      <div class="flex flex-col items-center">
+                        <div class="text-white font-bold text-sm mb-1">Flyer</div>
+                        <% flyer_available = @occurence.flyer_capacity - @flyer_count %>
+                        <div class={[
+                          "px-4 py-2 rounded-lg font-bold text-white text-center min-w-[100px] text-sm",
+                          cond do
+                            flyer_available == 0 -> "bg-red-500"
+                            flyer_available < 3 -> "bg-yellow-500"
+                            true -> "bg-teal-500"
+                          end
+                        ]}>
+                          {flyer_available} / {@occurence.flyer_capacity}
+                        </div>
+                      </div>
+                    <% end %>
                   </div>
                 </div>
               </div>
@@ -111,8 +136,7 @@ defmodule JamieWeb.OccurenceLive.Show do
               <%!-- Description --%>
               <div :if={@occurence.description} class="mb-8">
                 <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
-                  <.icon name="hero-document-text" class="h-5 w-5" />
-                  Description
+                  <.icon name="hero-document-text" class="h-5 w-5" /> Description
                 </h2>
                 <div class="prose prose-sm max-w-none text-base-content/80">
                   {markdown_to_html(@occurence.description)}
@@ -122,8 +146,7 @@ defmodule JamieWeb.OccurenceLive.Show do
               <%!-- Participant List --%>
               <div :if={@occurence.show_partecipant_list} class="mb-8">
                 <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
-                  <.icon name="hero-users" class="h-5 w-5" />
-                  Participants ({length(@participants)} registered)
+                  <.icon name="hero-users" class="h-5 w-5" /> Participants ({length(@participants)} registered)
                 </h2>
                 <div class="bg-base-200 rounded-xl p-4">
                   <%= if @participants == [] do %>
@@ -168,18 +191,15 @@ defmodule JamieWeb.OccurenceLive.Show do
                     navigate={~p"/events/#{@occurence.slug}/register"}
                     class="btn btn-primary flex-1 sm:flex-none"
                   >
-                    <.icon name="hero-check-circle" class="h-5 w-5" />
-                    Register for Event
+                    <.icon name="hero-check-circle" class="h-5 w-5" /> Register for Event
                   </.link>
                 <% else %>
                   <.link navigate={~p"/login"} class="btn btn-primary flex-1 sm:flex-none">
-                    <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" />
-                    Sign in to Register
+                    <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" /> Sign in to Register
                   </.link>
                 <% end %>
                 <button class="btn btn-ghost">
-                  <.icon name="hero-share" class="h-5 w-5" />
-                  Share
+                  <.icon name="hero-share" class="h-5 w-5" /> Share
                 </button>
               </div>
             </div>
@@ -194,9 +214,16 @@ defmodule JamieWeb.OccurenceLive.Show do
     occurence = Occurences.get_occurence_by_slug!(slug)
     participants = Occurences.list_participants(occurence.id, "confirmed")
 
+    # Count confirmed participants by role (single query)
+    counts = Occurences.count_confirmed_by_role(occurence.id)
+    base_count = Map.get(counts, "base", 0)
+    flyer_count = Map.get(counts, "flyer", 0)
+
     {:ok,
      socket
      |> assign(:occurence, occurence)
-     |> assign(:participants, participants)}
+     |> assign(:participants, participants)
+     |> assign(:base_count, base_count)
+     |> assign(:flyer_count, flyer_count)}
   end
 end

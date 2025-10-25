@@ -44,7 +44,7 @@ defmodule JamieWeb.OccurenceLive.Index do
                           <.icon name="hero-calendar-days" class="h-6 w-6 text-primary" />
                         </div>
                       </div>
-                      
+
                       <div class="flex-1 min-w-0">
                         <h3 class="text-lg font-semibold truncate">{occurence.title}</h3>
                         <div class="flex items-center gap-3 text-sm text-base-content/60 mt-1">
@@ -58,7 +58,7 @@ defmodule JamieWeb.OccurenceLive.Index do
                           </span>
                         </div>
                       </div>
-                      
+
                       <div class="flex items-center gap-2">
                         <.link
                           navigate={~p"/occurences/#{occurence.id}/edit"}

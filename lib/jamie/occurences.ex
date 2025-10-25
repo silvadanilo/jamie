@@ -341,6 +341,20 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
+  Returns confirmed participant counts grouped by role in a single query.
+  Returns a map like %{"base" => 3, "flyer" => 2}
+  """
+  def count_confirmed_by_role(occurence_id) do
+    Participant
+    |> where([p], p.occurence_id == ^occurence_id)
+    |> where([p], p.status == "confirmed")
+    |> group_by([p], p.role)
+    |> select([p], {p.role, count(p.id)})
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  @doc """
   Checks if an event has available spots.
   Returns {:ok, role} if spots available, {:error, :full} if full.
   If capacity is nil, it's considered unlimited.

@@ -44,7 +44,7 @@ defmodule Jamie.OccurencesTest do
         })
 
       public_list = Occurences.list_public_occurences()
-      
+
       # Filter to only count events created in this test (with is_private explicitly set)
       public_from_test = Enum.filter(public_list, fn occ -> occ.id == public_occurence.id end)
       assert length(public_from_test) == 1
@@ -194,6 +194,49 @@ defmodule Jamie.OccurencesTest do
       assert participant.role == "base"
     end
 
+    test "count_confirmed_by_role/1 returns counts grouped by role in single query" do
+      user = user_fixture()
+      occurence = occurence_fixture(%{created_by_id: user.id, base_capacity: 5})
+
+      # Add 2 confirmed base participants
+      Enum.each(1..2, fn _ ->
+        participant = user_fixture()
+
+        Occurences.register_participant(%{
+          occurence_id: occurence.id,
+          user_id: participant.id,
+          status: "confirmed",
+          role: "base"
+        })
+      end)
+
+      # Add 3 confirmed flyer participants
+      Enum.each(1..3, fn _ ->
+        participant = user_fixture()
+
+        Occurences.register_participant(%{
+          occurence_id: occurence.id,
+          user_id: participant.id,
+          status: "confirmed",
+          role: "flyer"
+        })
+      end)
+
+      # Add 1 waitlist participant (should not be counted)
+      waitlist_user = user_fixture()
+
+      Occurences.register_participant(%{
+        occurence_id: occurence.id,
+        user_id: waitlist_user.id,
+        status: "waitlist",
+        role: "base"
+      })
+
+      counts = Occurences.count_confirmed_by_role(occurence.id)
+      assert counts["base"] == 2
+      assert counts["flyer"] == 3
+    end
+
     test "count_confirmed_participants/2 counts only confirmed participants for a role" do
       user = user_fixture()
       occurence = occurence_fixture(%{created_by_id: user.id, base_capacity: 5})
@@ -201,7 +244,7 @@ defmodule Jamie.OccurencesTest do
       # Add 2 confirmed base participants
       participant1 = user_fixture()
       participant2 = user_fixture()
-      
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: participant1.id,
@@ -218,6 +261,7 @@ defmodule Jamie.OccurencesTest do
 
       # Add 1 waitlist base participant (should not be counted)
       participant3 = user_fixture()
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: participant3.id,
@@ -227,6 +271,7 @@ defmodule Jamie.OccurencesTest do
 
       # Add 1 confirmed flyer participant (should not be counted for base)
       participant4 = user_fixture()
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: participant4.id,
@@ -244,6 +289,7 @@ defmodule Jamie.OccurencesTest do
 
       # Add 2 confirmed participants
       participant1 = user_fixture()
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: participant1.id,
@@ -262,7 +308,7 @@ defmodule Jamie.OccurencesTest do
       # Fill base capacity
       participant1 = user_fixture()
       participant2 = user_fixture()
-      
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: participant1.id,
@@ -279,6 +325,7 @@ defmodule Jamie.OccurencesTest do
 
       # Fill flyer capacity
       participant3 = user_fixture()
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: participant3.id,
@@ -297,6 +344,7 @@ defmodule Jamie.OccurencesTest do
       # Add many participants
       Enum.each(1..10, fn _ ->
         participant = user_fixture()
+
         Occurences.register_participant(%{
           occurence_id: occurence.id,
           user_id: participant.id,
@@ -338,6 +386,7 @@ defmodule Jamie.OccurencesTest do
 
       # Add confirmed participant
       confirmed_user = user_fixture()
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: confirmed_user.id,
@@ -347,6 +396,7 @@ defmodule Jamie.OccurencesTest do
 
       # Add waitlist participant
       waitlist_user = user_fixture()
+
       Occurences.register_participant(%{
         occurence_id: occurence.id,
         user_id: waitlist_user.id,

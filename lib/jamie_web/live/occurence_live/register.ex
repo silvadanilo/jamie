@@ -45,8 +45,7 @@ defmodule JamieWeb.OccurenceLive.Register do
             <%!-- Event description --%>
             <div :if={@occurence.description} class="bg-base-200 rounded-xl p-4 mb-6">
               <h3 class="font-semibold mb-2 flex items-center gap-2">
-                <.icon name="hero-document-text" class="h-4 w-4 text-primary" />
-                Description
+                <.icon name="hero-document-text" class="h-4 w-4 text-primary" /> Description
               </h3>
               <div class="prose prose-sm max-w-none text-base-content/80">
                 {markdown_to_html(@occurence.description)}
@@ -87,7 +86,7 @@ defmodule JamieWeb.OccurenceLive.Register do
                 <div class="alert alert-info">
                   <.icon name="hero-information-circle" class="h-5 w-5" />
                   <div class="text-sm">
-              This event displays the participant list publicly. <br/>Please provide a nickname for display.
+                    This event displays the participant list publicly. <br />Please provide a nickname for display.
                   </div>
                 </div>
 
@@ -111,11 +110,10 @@ defmodule JamieWeb.OccurenceLive.Register do
               <div class="flex gap-3 pt-4">
                 <button type="submit" class="btn btn-primary flex-1" disabled={@registering}>
                   <%= if @registering do %>
-                    <span class="loading loading-spinner loading-sm"></span>
-                    Registering...
+                    <span class="loading loading-spinner loading-sm"></span> Registering...
                   <% else %>
                     <.icon name="hero-check-circle" class="h-5 w-5" />
-                    <%= if @is_full, do: "Join Waitlist", else: "Confirm Registration" %>
+                    {if @is_full, do: "Join Waitlist", else: "Confirm Registration"}
                   <% end %>
                 </button>
                 <.link navigate={~p"/events/#{@occurence.slug}"} class="btn btn-ghost">
@@ -191,8 +189,8 @@ defmodule JamieWeb.OccurenceLive.Register do
     # Check if there are available spots for the chosen role
     confirmed_count = Occurences.count_confirmed_participants(occurence.id, role)
     capacity = if role == "base", do: occurence.base_capacity, else: occurence.flyer_capacity
-    
-    status = 
+
+    status =
       cond do
         # Unlimited capacity
         is_nil(capacity) -> "confirmed"
@@ -215,8 +213,14 @@ defmodule JamieWeb.OccurenceLive.Register do
       {:ok, _participant} ->
         # Update user's preferred role and nickname if provided
         user_updates = %{}
-        user_updates = if participant_params["role"], do: Map.put(user_updates, "preferred_role", role), else: user_updates
-        user_updates = if participant_params["nickname"] && participant_params["nickname"] != "", do: Map.put(user_updates, "nickname", participant_params["nickname"]), else: user_updates
+
+        user_updates =
+          if participant_params["role"], do: Map.put(user_updates, "preferred_role", role), else: user_updates
+
+        user_updates =
+          if participant_params["nickname"] && participant_params["nickname"] != "",
+            do: Map.put(user_updates, "nickname", participant_params["nickname"]),
+            else: user_updates
 
         if map_size(user_updates) > 0 do
           Jamie.Accounts.update_user_profile(user, user_updates)

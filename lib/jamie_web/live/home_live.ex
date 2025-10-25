@@ -113,21 +113,6 @@ defmodule JamieWeb.HomeLive do
                       </div>
                     </div>
 
-                    <div
-                      :if={
-                        occurence.show_available_spots &&
-                          (occurence.base_capacity || occurence.flyer_capacity)
-                      }
-                      class="mt-3 flex gap-2 text-xs"
-                    >
-                      <span :if={occurence.base_capacity} class="badge badge-outline">
-                        Base: {occurence.base_capacity} spots
-                      </span>
-                      <span :if={occurence.flyer_capacity} class="badge badge-outline">
-                        Flyer: {occurence.flyer_capacity} spots
-                      </span>
-                    </div>
-
                     <div class="card-actions justify-end mt-4">
                       <.link
                         navigate={~p"/events/#{occurence.slug}"}
