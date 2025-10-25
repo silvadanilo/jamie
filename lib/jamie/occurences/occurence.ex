@@ -32,6 +32,7 @@ defmodule Jamie.Occurences.Occurence do
 
     belongs_to :created_by, Jamie.Accounts.User
     has_many :coorganizers, Jamie.Occurences.Coorganizer
+    has_many :participants, Jamie.Occurences.Participant
 
     timestamps(type: :utc_datetime)
   end

@@ -8,6 +8,7 @@ defmodule Jamie.Occurences do
 
   alias Jamie.Occurences.Occurence
   alias Jamie.Occurences.Coorganizer
+  alias Jamie.Occurences.Participant
   alias Jamie.Accounts.User
 
   @doc """
@@ -78,8 +79,6 @@ defmodule Jamie.Occurences do
   end
 
   defp store_creator_as_coorganizer(occurence) do
-    creator_email = get_creator_email(occurence.created_by_id)
-
     %Coorganizer{}
     |> Coorganizer.changeset(%{
       occurence_id: occurence.id,
@@ -88,11 +87,6 @@ defmodule Jamie.Occurences do
       is_creator: true
     })
     |> Repo.insert()
-  end
-
-  defp get_creator_email(user_id) do
-    user = Repo.get!(User, user_id)
-    user.email
   end
 
   @doc """
@@ -311,5 +305,90 @@ defmodule Jamie.Occurences do
     |> where([c], c.user_id == ^user_id)
     |> where([c], c.is_creator == true)
     |> Repo.exists?()
+  end
+
+  ## Participants
+
+  @doc """
+  Checks if a user is already registered for an event.
+  """
+  def user_registered?(occurence_id, user_id) do
+    Participant
+    |> where([p], p.occurence_id == ^occurence_id)
+    |> where([p], p.user_id == ^user_id)
+    |> Repo.exists?()
+  end
+
+  @doc """
+  Gets a participant by occurence and user.
+  """
+  def get_participant(occurence_id, user_id) do
+    Participant
+    |> where([p], p.occurence_id == ^occurence_id)
+    |> where([p], p.user_id == ^user_id)
+    |> Repo.one()
+  end
+
+  @doc """
+  Counts confirmed participants for an event by registration type.
+  """
+  def count_confirmed_participants(occurence_id, role \\ "base") do
+    Participant
+    |> where([p], p.occurence_id == ^occurence_id)
+    |> where([p], p.role == ^role)
+    |> where([p], p.status == "confirmed")
+    |> Repo.aggregate(:count, :id)
+  end
+
+  @doc """
+  Checks if an event has available spots.
+  Returns {:ok, role} if spots available, {:error, :full} if full.
+  If capacity is nil, it's considered unlimited.
+  """
+  def check_available_spots(occurence) do
+    base_count = count_confirmed_participants(occurence.id, "base")
+    flyer_count = count_confirmed_participants(occurence.id, "flyer")
+
+    cond do
+      # If base_capacity is nil, it's unlimited
+      is_nil(occurence.base_capacity) -> {:ok, "base"}
+      # If base has available spots
+      base_count < occurence.base_capacity -> {:ok, "base"}
+      # If flyer_capacity is nil, it's unlimited
+      is_nil(occurence.flyer_capacity) -> {:ok, "flyer"}
+      # If flyer has available spots
+      flyer_count < occurence.flyer_capacity -> {:ok, "flyer"}
+      # Both are full
+      true -> {:error, :full}
+    end
+  end
+
+  @doc """
+  Registers a user for an event.
+  """
+  def register_participant(attrs \\ %{}) do
+    %Participant{}
+    |> Participant.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Lists all participants for an event with user preloaded.
+  """
+  def list_participants(occurence_id) do
+    Participant
+    |> where([p], p.occurence_id == ^occurence_id)
+    |> order_by([p], asc: p.inserted_at)
+    |> preload(:user)
+    |> Repo.all()
+  end
+
+  @doc """
+  Cancels a participant registration.
+  """
+  def cancel_participant(participant) do
+    participant
+    |> Participant.changeset(%{status: "cancelled"})
+    |> Repo.update()
   end
 end

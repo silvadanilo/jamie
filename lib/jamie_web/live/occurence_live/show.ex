@@ -135,10 +135,20 @@ defmodule JamieWeb.OccurenceLive.Show do
 
               <%!-- Action buttons --%>
               <div class="flex flex-wrap gap-3 pt-6 border-t border-base-300">
-                <button class="btn btn-primary flex-1 sm:flex-none">
-                  <.icon name="hero-check-circle" class="h-5 w-5" />
-                  Register for Event
-                </button>
+                <%= if @current_user do %>
+                  <.link
+                    navigate={~p"/events/#{@occurence.slug}/register"}
+                    class="btn btn-primary flex-1 sm:flex-none"
+                  >
+                    <.icon name="hero-check-circle" class="h-5 w-5" />
+                    Register for Event
+                  </.link>
+                <% else %>
+                  <.link navigate={~p"/login"} class="btn btn-primary flex-1 sm:flex-none">
+                    <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" />
+                    Sign in to Register
+                  </.link>
+                <% end %>
                 <button class="btn btn-ghost">
                   <.icon name="hero-share" class="h-5 w-5" />
                   Share

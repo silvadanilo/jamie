@@ -33,10 +33,17 @@ defmodule Jamie.Occurences.Coorganizer do
     ])
     |> validate_required([:occurence_id])
     |> validate_required_unless_creator()
-    |> validate_format(:invited_email, ~r/@/)
+    |> validate_email_format()
     |> foreign_key_constraint(:occurence_id)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:invited_by_id)
+  end
+
+  defp validate_email_format(changeset) do
+    case get_field(changeset, :invited_email) do
+      nil -> changeset
+      _email -> validate_format(changeset, :invited_email, ~r/@/)
+    end
   end
 
   defp validate_required_unless_creator(changeset) do
