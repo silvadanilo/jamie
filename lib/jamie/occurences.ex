@@ -30,11 +30,15 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
-  Returns the list of public occurences.
+  Returns the list of upcoming public occurences.
+  Sorted from nearest to farthest.
   """
   def list_public_occurences do
+    now = DateTime.utc_now()
+
     Occurence
     |> where([o], o.is_private == false and o.disabled == false)
+    |> where([o], o.date >= ^now)
     |> order_by([o], asc: o.date)
     |> Repo.all()
   end

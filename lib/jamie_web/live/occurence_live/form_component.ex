@@ -42,8 +42,11 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
             <div phx-update="ignore" id="location-autocomplete-wrapper">
               <input
                 type="text"
-                id={@form[:location].id}
-                name={@form[:location].name}
+                id="location-autocomplete-input"
+                data-location-id={@form[:location].id}
+                data-latitude-id={@form[:latitude].id}
+                data-longitude-id={@form[:longitude].id}
+                data-place-id={@form[:google_place_id].id}
                 value={Phoenix.HTML.Form.normalize_value("text", @form[:location].value)}
                 phx-hook="PlacesAutocomplete"
                 class="w-full input input-lg text-base min-h-[3rem]"
@@ -54,10 +57,12 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
           </label>
         </div>
 
-        <input type="hidden" name={@form[:latitude].name} value={@form[:latitude].value || ""} />
-        <input type="hidden" name={@form[:longitude].name} value={@form[:longitude].value || ""} />
+        <input type="hidden" id={@form[:location].id} name={@form[:location].name} value={@form[:location].value || ""} />
+        <input type="hidden" id={@form[:latitude].id} name={@form[:latitude].name} value={@form[:latitude].value || ""} />
+        <input type="hidden" id={@form[:longitude].id} name={@form[:longitude].name} value={@form[:longitude].value || ""} />
         <input
           type="hidden"
+          id={@form[:google_place_id].id}
           name={@form[:google_place_id].name}
           value={@form[:google_place_id].value || ""}
         />

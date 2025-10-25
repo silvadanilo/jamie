@@ -92,7 +92,20 @@ defmodule JamieWeb.HomeLive do
                       </div>
                       <div :if={occurence.location} class="flex items-center gap-2">
                         <.icon name="hero-map-pin" class="h-4 w-4 shrink-0" />
-                        <span class="truncate">{occurence.location}</span>
+                        <div class="flex-1 flex items-center gap-2">
+                          <span class="truncate flex-1">{occurence.location}</span>
+                          <a
+                            :if={occurence.latitude && occurence.longitude}
+                            href={"https://www.google.com/maps/search/?api=1&query=#{occurence.latitude},#{occurence.longitude}"}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="link link-primary link-hover text-xs flex items-center gap-1 shrink-0"
+                            title="Open in Google Maps"
+                          >
+                            <.icon name="hero-arrow-top-right-on-square" class="h-3 w-3" />
+                            <span class="hidden sm:inline">Maps</span>
+                          </a>
+                        </div>
                       </div>
                       <div :if={occurence.cost} class="flex items-center gap-2">
                         <.icon name="hero-currency-dollar" class="h-4 w-4 shrink-0" />

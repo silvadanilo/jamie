@@ -32,16 +32,16 @@ const PlacesAutocomplete = {
   },
   
   updated() {
-    if (!this.autocompleteElement) {
+    if (!this.autocomplete) {
       this.retryCount = 0
       this.initAutocomplete()
     }
   },
   
   initAutocomplete() {
-    if (this.autocompleteElement) return
+    if (this.autocomplete) return
     
-    if (typeof google === 'undefined' || !google.maps || !google.maps.places || !google.maps.places.PlaceAutocompleteElement) {
+    if (typeof google === 'undefined' || !google.maps || !google.maps.places || !google.maps.places.Autocomplete) {
       this.retryCount++
       if (this.retryCount < this.maxRetries) {
         setTimeout(() => this.initAutocomplete(), 100)
@@ -54,50 +54,54 @@ const PlacesAutocomplete = {
     const input = this.el
     const form = input.closest('form')
     
-    // Create the new PlaceAutocompleteElement
-    this.autocompleteElement = new google.maps.places.PlaceAutocompleteElement()
+    // Get the IDs from data attributes
+    const locationId = input.dataset.locationId
+    const latitudeId = input.dataset.latitudeId
+    const longitudeId = input.dataset.longitudeId
+    const placeIdAttr = input.dataset.placeId
     
-    // Replace the input with the autocomplete element
-    input.parentNode.insertBefore(this.autocompleteElement, input)
-    input.style.display = 'none'
-    
-    // Style the autocomplete element to match our input
-    this.autocompleteElement.style.width = '100%'
+    // Use the classic Autocomplete API
+    this.autocomplete = new google.maps.places.Autocomplete(input, {
+      fields: ['place_id', 'geometry', 'name', 'formatted_address']
+    })
     
     // Listen for place selection
-    this.autocompleteElement.addEventListener('gmp-placeselect', async (event) => {
-      const place = event.place
+    this.autocomplete.addListener('place_changed', () => {
+      const place = this.autocomplete.getPlace()
       
-      if (!place.location) {
-        console.warn('No location for place')
+      if (!place.geometry || !place.geometry.location) {
         return
       }
       
-      const lat = place.location.lat()
-      const lng = place.location.lng()
-      const placeId = place.id
-      const displayName = place.displayName || place.formattedAddress
+      const lat = place.geometry.location.lat()
+      const lng = place.geometry.location.lng()
+      const placeId = place.place_id
+      const displayName = place.name || place.formatted_address
       
-      // Update the hidden input value
-      input.value = displayName
+      // Find the hidden inputs by ID
+      const locationInput = document.getElementById(locationId)
+      const latInput = document.getElementById(latitudeId)
+      const lngInput = document.getElementById(longitudeId)
+      const placeIdInput = document.getElementById(placeIdAttr)
       
-      // Update the hidden coordinate fields
-      const latInput = form.querySelector('input[name="occurence[latitude]"]')
-      const lngInput = form.querySelector('input[name="occurence[longitude]"]')
-      const placeIdInput = form.querySelector('input[name="occurence[google_place_id]"]')
-      
+      // Update all the hidden inputs
+      if (locationInput) locationInput.value = displayName
       if (latInput) latInput.value = lat
       if (lngInput) lngInput.value = lng
       if (placeIdInput) placeIdInput.value = placeId
       
-      // Trigger form change event for LiveView
-      form.dispatchEvent(new Event('change', { bubbles: true }))
+      // Trigger a blur event on one of the visible inputs to make LiveView pick up the changes
+      const titleInput = form.querySelector('input[name="occurence[title]"]')
+      if (titleInput) {
+        titleInput.dispatchEvent(new Event('blur', { bubbles: true }))
+      }
     })
   },
   
   destroyed() {
-    if (this.autocompleteElement) {
-      this.autocompleteElement.remove()
+    if (this.autocomplete) {
+      google.maps.event.clearInstanceListeners(this.autocomplete)
+      this.autocomplete = null
     }
   }
 }
