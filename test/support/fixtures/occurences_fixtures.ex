@@ -27,4 +27,18 @@ defmodule Jamie.OccurencesFixtures do
 
     occurence
   end
+
+  def participant_fixture(attrs \\ %{}) do
+    {:ok, participant} =
+      attrs
+      |> Enum.into(%{
+        status: "confirmed",
+        role: "base",
+        notes: nil,
+        nickname: nil
+      })
+      |> Jamie.Occurences.register_participant()
+
+    participant
+  end
 end

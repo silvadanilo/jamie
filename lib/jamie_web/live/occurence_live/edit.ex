@@ -21,12 +21,18 @@ defmodule JamieWeb.OccurenceLive.Edit do
           </div>
 
           <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
-            <.live_component
-              module={JamieWeb.OccurenceLive.CoorganizersComponent}
-              id={"coorganizers-#{@occurence.id}"}
-              occurence={@occurence}
-              current_user={@current_user}
-            />
+            <div class="flex items-center justify-between">
+              <div>
+                <h3 class="text-xl font-semibold">Co-organizers</h3>
+                <p class="text-sm text-base-content/70 mt-1">Manage who can help organize this event</p>
+              </div>
+              <.link
+                navigate={~p"/occurences/#{@occurence.id}/coorganizers"}
+                class="btn btn-primary"
+              >
+                <.icon name="hero-users" class="h-5 w-5" /> Manage Co-organizers
+              </.link>
+            </div>
           </div>
         </div>
       </div>

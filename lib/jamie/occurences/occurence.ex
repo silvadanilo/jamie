@@ -32,11 +32,15 @@ defmodule Jamie.Occurences.Occurence do
 
     belongs_to :created_by, Jamie.Accounts.User
     has_many :coorganizers, Jamie.Occurences.Coorganizer
+    has_many :participants, Jamie.Occurences.Participant
 
     timestamps(type: :utc_datetime)
   end
 
   def changeset(occurence, attrs) do
+    # Convert string coordinates to numbers if present
+    attrs = normalize_coordinates(attrs)
+
     occurence
     |> cast(attrs, [
       :title,
@@ -70,6 +74,25 @@ defmodule Jamie.Occurences.Occurence do
     |> validate_number(:cost, greater_than_or_equal_to: 0)
     |> unique_constraint(:slug)
     |> foreign_key_constraint(:created_by_id)
+  end
+
+  defp normalize_coordinates(attrs) when is_map(attrs) do
+    attrs
+    |> normalize_coordinate_field("latitude")
+    |> normalize_coordinate_field("longitude")
+  end
+
+  defp normalize_coordinate_field(attrs, field) do
+    case Map.get(attrs, field) do
+      value when is_binary(value) and value != "" ->
+        case Float.parse(value) do
+          {float_value, _} -> Map.put(attrs, field, float_value)
+          :error -> attrs
+        end
+
+      _ ->
+        attrs
+    end
   end
 
   defp maybe_generate_slug(changeset) do

@@ -17,6 +17,7 @@ defmodule Jamie.Accounts.User do
     field :surname, :string
     field :phone, :string
     field :preferred_role, :string, default: "base"
+    field :nickname, :string
 
     timestamps(type: :utc_datetime)
   end
@@ -99,7 +100,7 @@ defmodule Jamie.Accounts.User do
 
   def profile_changeset(user, attrs) do
     user
-    |> cast(attrs, [:name, :surname, :phone, :preferred_role])
+    |> cast(attrs, [:name, :surname, :phone, :preferred_role, :nickname])
     |> validate_inclusion(:preferred_role, ["base", "flyer"])
   end
 end

@@ -560,4 +560,17 @@ defmodule JamieWeb.CoreComponents do
   def translate_errors(errors, field) when is_list(errors) do
     for {^field, {msg, opts}} <- errors, do: translate_error({msg, opts})
   end
+
+  @doc """
+  Renders markdown content as HTML.
+  """
+  def markdown_to_html(nil), do: ""
+  def markdown_to_html(""), do: ""
+
+  def markdown_to_html(markdown) when is_binary(markdown) do
+    case Earmark.as_html(markdown) do
+      {:ok, html, _} -> Phoenix.HTML.raw(html)
+      {:error, _, _} -> markdown
+    end
+  end
 end
