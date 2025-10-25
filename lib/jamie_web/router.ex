@@ -50,6 +50,7 @@ defmodule JamieWeb.Router do
       live "/occurences/new", OccurenceLive.New, :new
       live "/occurences/:id/edit", OccurenceLive.Edit, :edit
       live "/occurences/:id/coorganizers", OccurenceLive.Coorganizers, :index
+      live "/occurences/:id/participants", OccurenceLive.Participants, :index
       live "/events/:slug/register", OccurenceLive.Register, :register
     end
   end

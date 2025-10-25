@@ -416,4 +416,47 @@ defmodule Jamie.Occurences do
     |> Participant.changeset(%{status: "cancelled"})
     |> Repo.update()
   end
+
+  @doc """
+  Gets a single participant by ID.
+  """
+  def get_participant_by_id!(id) do
+    Participant
+    |> preload(:user)
+    |> Repo.get!(id)
+  end
+
+  @doc """
+  Deletes a participant.
+  """
+  def delete_participant(participant) do
+    Repo.delete(participant)
+  end
+
+  @doc """
+  Promotes a participant from waitlist to confirmed.
+  """
+  def promote_participant_to_confirmed(participant) do
+    participant
+    |> Participant.changeset(%{status: "confirmed"})
+    |> Repo.update()
+  end
+
+  @doc """
+  Restores a participant from cancelled status.
+  Checks if there are available spots and assigns to confirmed or waitlist accordingly.
+  """
+  def restore_participant(participant, occurence) do
+    case check_available_spots(occurence) do
+      {:ok, _role} ->
+        participant
+        |> Participant.changeset(%{status: "confirmed"})
+        |> Repo.update()
+
+      {:error, :full} ->
+        participant
+        |> Participant.changeset(%{status: "waitlist"})
+        |> Repo.update()
+    end
+  end
 end

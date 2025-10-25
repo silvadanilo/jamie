@@ -72,6 +72,12 @@ defmodule JamieWeb.OccurenceLive.Index do
                         >
                           <.icon name="hero-users" class="h-5 w-5" />
                         </.link>
+                        <.link
+                          navigate={~p"/occurences/#{occurence.id}/participants"}
+                          class="btn btn-sm h-11 px-4 border-2 border-base-content/20 hover:border-base-content/40 bg-transparent hover:bg-base-content/5"
+                        >
+                          <.icon name="hero-user-group" class="h-5 w-5" />
+                        </.link>
                         <button
                           type="button"
                           phx-click="delete"
