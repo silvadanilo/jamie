@@ -42,6 +42,7 @@ custom classes must fully style the input
 - Implement **subtle micro-interactions** (e.g., button hover effects, and smooth transitions)
 - Ensure **clean typography, spacing, and layout balance** for a refined, premium look
 - Focus on **delightful details** like hover effects, loading states, and smooth page transitions
+- Mobile first responsive design is a must, but also desktop design matters. Ensure your app looks and works great on all screen sizes
 
 
 <!-- usage-rules-start -->
