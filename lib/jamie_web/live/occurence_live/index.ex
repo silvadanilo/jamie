@@ -68,8 +68,16 @@ defmodule JamieWeb.OccurenceLive.Index do
                           <.link
                             navigate={~p"/occurences/#{occurence.id}/edit"}
                             class="btn btn-sm btn-ghost"
+                            title="Edit event"
                           >
                             <.icon name="hero-pencil" class="h-4 w-4" />
+                          </.link>
+                          <.link
+                            navigate={~p"/occurences/#{occurence.id}/coorganizers"}
+                            class="btn btn-sm btn-ghost"
+                            title="Manage co-organizers"
+                          >
+                            <.icon name="hero-users" class="h-4 w-4" />
                           </.link>
                           <button
                             type="button"
@@ -77,6 +85,7 @@ defmodule JamieWeb.OccurenceLive.Index do
                             phx-value-id={occurence.id}
                             data-confirm="Are you sure you want to delete this event?"
                             class="btn btn-sm btn-ghost text-error"
+                            title="Delete event"
                           >
                             <.icon name="hero-trash" class="h-4 w-4" />
                           </button>

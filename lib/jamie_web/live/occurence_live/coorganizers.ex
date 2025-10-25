@@ -1,0 +1,53 @@
+defmodule JamieWeb.OccurenceLive.Coorganizers do
+  use JamieWeb, :live_view
+
+  alias Jamie.Occurences
+
+  def render(assigns) do
+    ~H"""
+    <Layouts.app flash={@flash} current_scope={@current_user}>
+      <div class="min-h-screen px-4 py-6 sm:py-8">
+        <div class="max-w-4xl mx-auto">
+          <div class="mb-6">
+            <.link navigate={~p"/occurences/#{@occurence.id}/edit"} class="btn btn-ghost btn-sm">
+              <.icon name="hero-arrow-left" class="h-4 w-4" /> Back to Event
+            </.link>
+          </div>
+
+          <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
+            <.header class="mb-6">
+              Manage Co-organizers
+              <:subtitle>
+                Event: {@occurence.title}
+              </:subtitle>
+            </.header>
+
+            <.live_component
+              module={JamieWeb.OccurenceLive.CoorganizersComponent}
+              id={"coorganizers-#{@occurence.id}"}
+              occurence={@occurence}
+              current_user={@current_user}
+            />
+          </div>
+        </div>
+      </div>
+    </Layouts.app>
+    """
+  end
+
+  def mount(%{"id" => id}, _session, socket) do
+    occurence = Occurences.get_occurence!(id)
+    user = socket.assigns.current_user
+
+    if Occurences.can_manage_occurence?(occurence, user) do
+      {:ok, assign(socket, :occurence, occurence)}
+    else
+      socket =
+        socket
+        |> put_flash(:error, "You are not authorized to manage co-organizers for this event")
+        |> push_navigate(to: ~p"/occurences")
+
+      {:ok, socket}
+    end
+  end
+end
