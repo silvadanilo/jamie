@@ -127,20 +127,60 @@ defmodule JamieWeb.OccurenceLive.Participants do
           <div class="min-h-screen px-4 py-6 sm:py-8">
             <div class="max-w-7xl mx-auto">
               <div class="mb-8">
-                <.link
-                  navigate={~p"/occurences"}
-                  class="text-base-content/70 hover:text-base-content text-sm mb-4 inline-flex items-center gap-2"
-                >
-                  <.icon name="hero-arrow-left" class="h-4 w-4" /> Back to Events
-                </.link>
-                <div class="flex justify-between items-start">
-                  <h1 class="text-3xl sm:text-4xl font-bold text-base-content mt-2">{@occurence.title}</h1>
-                  <.link
-                    navigate={~p"/occurences/#{@occurence.id}/participants/new"}
-                    class="btn btn-primary gap-2"
-                  >
-                    <.icon name="hero-plus" class="h-4 w-4" /> Add Participant
-                  </.link>
+                <.header>
+                  Participants - {@occurence.title}
+                  <:subtitle>
+                    {Calendar.strftime(@occurence.date, "%B %d, %Y at %I:%M %p")} • {@occurence.location || "Location TBD"}
+                  </:subtitle>
+                  <:actions>
+                    <.link navigate={~p"/occurences/#{@occurence.id}/participants/new"}>
+                      <.button>
+                        <.icon name="hero-plus" class="w-5 h-5" /> Add Participant
+                      </.button>
+                    </.link>
+                    <.link navigate={~p"/occurences"}>
+                      <.button class="btn-ghost btn-sm">
+                        <.icon name="hero-arrow-left" class="w-4 h-4" /> Back
+                      </.button>
+                    </.link>
+                  </:actions>
+                </.header>
+              </div>
+
+              <%!-- Registration Link --%>
+              <div class="mb-8">
+                <div class="alert shadow-2xl border-2 border-info/20 mt-6">
+                  <.icon name="hero-share" class="w-6 h-6 text-info" />
+                  <div class="flex-1">
+                    <h3 class="font-bold">Registration Link</h3>
+                    <div class="text-xs text-base-content/70">Share this link with participants to register</div>
+                  </div>
+                  <div class="flex gap-2 flex-1">
+                    <input
+                      type="text"
+                      readonly
+                      value={Phoenix.VerifiedRoutes.url(@socket, ~p"/events/#{@occurence.slug}/register")}
+                      id="participant-share-link"
+                      class="input input-bordered flex-1 font-mono text-sm min-w-0"
+                    />
+                    <button
+                      type="button"
+                      onclick="navigator.clipboard.writeText(document.getElementById('participant-share-link').value)"
+                      phx-click={
+                        JS.transition(
+                          {"transition-all duration-200", "btn-primary", "btn-success"},
+                          time: 100
+                        )
+                        |> JS.transition(
+                          {"transition-all duration-200", "btn-success", "btn-primary"},
+                          time: 1500
+                        )
+                      }
+                      class="btn btn-primary btn-sm"
+                    >
+                      <.icon name="hero-clipboard-document" class="w-5 h-5" /> Copy
+                    </button>
+                  </div>
                 </div>
               </div>
 
@@ -673,4 +713,5 @@ defmodule JamieWeb.OccurenceLive.Participants do
         {:noreply, put_flash(socket, :error, "Failed to update participant role")}
     end
   end
+
 end

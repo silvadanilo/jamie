@@ -1,17 +1,18 @@
 <Layouts.app flash={@flash} current_scope={@current_user}>
   <div class="min-h-screen px-4 py-6 sm:py-8">
     <div class="max-w-7xl mx-auto">
-      <div class="mb-6 sm:mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <div>
-          <h1 class="text-3xl sm:text-4xl font-bold">My Events</h1>
-          <p class="mt-2 text-base-content/70">Manage your jam occurences</p>
-        </div>
-        <.link
-          navigate={~p"/occurences/new"}
-          class="btn btn-primary min-h-14 text-base sm:text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
-        >
-          <.icon name="hero-plus" class="h-5 w-5" /> Create Event
-        </.link>
+      <div class="mb-6 sm:mb-8">
+        <.header>
+          My Events
+          <:subtitle>Manage your jam occurences</:subtitle>
+          <:actions>
+            <.link navigate={~p"/occurences/new"}>
+              <.button class="min-h-14 text-base sm:text-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200">
+                <.icon name="hero-plus" class="h-5 w-5" /> Create Event
+              </.button>
+            </.link>
+          </:actions>
+        </.header>
       </div>
 
       <div class="grid gap-4 sm:gap-6">
