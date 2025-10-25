@@ -129,9 +129,12 @@ defmodule JamieWeb.HomeLive do
                     </div>
 
                     <div class="card-actions justify-end mt-4">
-                      <button class="btn btn-primary btn-sm">
+                      <.link
+                        navigate={~p"/events/#{occurence.slug}"}
+                        class="btn btn-primary btn-sm"
+                      >
                         View Details <.icon name="hero-arrow-right" class="h-4 w-4 ml-1" />
-                      </button>
+                      </.link>
                     </div>
                   </div>
                 </div>
