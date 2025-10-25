@@ -175,13 +175,7 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
       |> Occurences.change_occurence(occurence_params)
       |> Map.put(:action, :validate)
 
-    # Apply the changeset to get updated data
-    updated_occurence = Ecto.Changeset.apply_changes(changeset)
-
-    {:noreply,
-     socket
-     |> assign(:occurence, updated_occurence)
-     |> assign_form(changeset)}
+    {:noreply, assign_form(socket, changeset)}
   end
 
   def handle_event("save", %{"occurence" => occurence_params}, socket) do

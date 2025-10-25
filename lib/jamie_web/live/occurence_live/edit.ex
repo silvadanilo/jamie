@@ -7,7 +7,7 @@ defmodule JamieWeb.OccurenceLive.Edit do
     ~H"""
     <Layouts.app flash={@flash} current_scope={@current_user}>
       <div class="min-h-screen px-4 py-6 sm:py-8">
-        <div class="max-w-3xl mx-auto">
+        <div class="max-w-3xl mx-auto space-y-6">
           <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
             <.live_component
               module={JamieWeb.OccurenceLive.FormComponent}
@@ -17,6 +17,15 @@ defmodule JamieWeb.OccurenceLive.Edit do
               occurence={@occurence}
               current_user={@current_user}
               navigate={~p"/occurences"}
+            />
+          </div>
+
+          <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
+            <.live_component
+              module={JamieWeb.OccurenceLive.CoorganizersComponent}
+              id={"coorganizers-#{@occurence.id}"}
+              occurence={@occurence}
+              current_user={@current_user}
             />
           </div>
         </div>
