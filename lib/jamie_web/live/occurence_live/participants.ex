@@ -224,7 +224,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
                   total={(@occurence.base_capacity || 0) + (@occurence.flyer_capacity || 0)}
                   subtitle="Confirmed registrations"
                   icon="hero-users"
-                  color="blue"
+                  color="white"
                 />
 
                 <.statistics_card

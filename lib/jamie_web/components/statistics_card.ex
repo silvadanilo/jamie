@@ -44,82 +44,138 @@ defmodule JamieWeb.StatisticsCard do
   def statistics_card(assigns) do
     ~H"""
     <div class={[
-      "bg-base-100/80 backdrop-blur rounded-2xl border border-base-300 p-6 relative",
+      "bg-base-100/80 backdrop-blur rounded-lg border-2 border-base-300 p-3 relative shadow-md",
       @class
     ]}>
-      <div class="flex justify-between items-start mb-4">
-        <h3 class="text-base-content font-semibold text-lg">{@title}</h3>
-        <button
-          :if={@editable && !@editing}
-          phx-click={@on_edit}
-          phx-value-type={@edit_type}
-          class="p-1 rounded-lg hover:bg-base-200 transition-colors"
-          title={@edit_title}
-        >
-          <.icon name="hero-pencil" class="h-4 w-4 text-base-content/70" />
-        </button>
+      <div class="flex justify-between items-start mb-1">
+        <h3 class="text-base-content font-semibold text-xs">{@title}</h3>
+        <%= if @editable && !@editing do %>
+          <.edit_button
+            on_edit={@on_edit}
+            edit_type={@edit_type}
+            edit_title={@edit_title}
+          />
+        <% else %>
+          <.transparent_icon />
+        <% end %>
       </div>
 
       <div class="flex items-center justify-between">
         <div>
           <%= if @editing do %>
-            <form phx-submit={@on_save} phx-value-type={@edit_type} class="flex items-center gap-2">
-              <span class="text-base-content text-2xl font-bold">{@value}/</span>
-              <input
-                type="number"
-                name="capacity"
-                value={@total}
-                min="0"
-                class="w-16 px-2 py-1 bg-base-200 border border-base-300 rounded text-base-content text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary"
-                autofocus
-              />
-              <div class="flex gap-1">
-                <button
-                  type="submit"
-                  class="p-1 rounded hover:bg-green-500/20 transition-colors"
-                  title="Save"
-                >
-                  <.icon name="hero-check" class="h-4 w-4 text-green-500" />
-                </button>
-                <button
-                  type="button"
-                  phx-click={@on_cancel}
-                  class="p-1 rounded hover:bg-red-500/20 transition-colors"
-                  title="Cancel"
-                >
-                  <.icon name="hero-x-mark" class="h-4 w-4 text-red-500" />
-                </button>
-              </div>
-            </form>
+            <.edit_form
+              value={@value}
+              total={@total}
+              on_save={@on_save}
+              on_cancel={@on_cancel}
+              edit_type={@edit_type}
+            />
           <% else %>
-            <div class={[
-              "text-3xl font-bold",
-              @color == "purple" && "text-secondary",
-              @color == "white" && "",
-              @color == "orange" && "text-warning",
-              @color == "indigo" && "text-info",
-              @color == "violet" && "text-secondary",
-              @color == "yellow" && "text-warning"
-            ]}>
-              {@value}/{@total}
-            </div>
+            <.value_display
+              value={@value}
+              total={@total}
+              color={@color}
+            />
           <% end %>
-          <p class="text-base-content/70 text-sm mt-1">
+          <p class="text-base-content/70 text-xs mt-0">
             {@subtitle}
           </p>
         </div>
-        <div class={[
-          @color == "purple" && "text-secondary",
-          @color == "blue" && "text-primary",
-          @color == "orange" && "text-warning",
-          @color == "indigo" && "text-info",
-          @color == "violet" && "text-secondary",
-          @color == "yellow" && "text-warning"
-        ]}>
-          <.icon name={@icon} class="h-8 w-8" />
-        </div>
+        <.icon_display icon={@icon} color={@color} />
       </div>
     </div>
     """
+  end
+
+  # Helper component for edit button
+  defp edit_button(assigns) do
+    ~H"""
+    <button
+      phx-click={@on_edit}
+      phx-value-type={@edit_type}
+      class="p-1 rounded-lg hover:bg-base-200 transition-colors"
+      title={@edit_title}
+    >
+      <.icon name="hero-pencil" class="h-4 w-4 text-base-content/70" />
+    </button>
+    """
+  end
+
+  # Helper component for transparent icon placeholder
+  defp transparent_icon(assigns) do
+    ~H"""
+    <div class="p-1">
+      <.icon name="hero-pencil" class="h-4 w-4 text-transparent" />
+    </div>
+    """
+  end
+
+  # Helper component for edit form
+  defp edit_form(assigns) do
+    ~H"""
+    <form phx-submit={@on_save} phx-value-type={@edit_type} class="flex items-center gap-2">
+      <span class="text-base-content text-2xl font-bold">{@value}/</span>
+      <input
+        type="number"
+        name="capacity"
+        value={@total}
+        min="0"
+        class="w-16 px-2 py-1 bg-base-200 border border-base-300 rounded text-base-content text-2xl font-bold text-center focus:outline-none focus:ring-2 focus:ring-primary"
+        autofocus
+      />
+      <div class="flex gap-1">
+        <button
+          type="submit"
+          class="p-1 rounded hover:bg-green-500/20 transition-colors"
+          title="Save"
+        >
+          <.icon name="hero-check" class="h-4 w-4 text-green-500" />
+        </button>
+        <button
+          type="button"
+          phx-click={@on_cancel}
+          class="p-1 rounded hover:bg-red-500/20 transition-colors"
+          title="Cancel"
+        >
+          <.icon name="hero-x-mark" class="h-4 w-4 text-red-500" />
+        </button>
+      </div>
+    </form>
+    """
+  end
+
+  # Helper component for value display
+  defp value_display(assigns) do
+    ~H"""
+    <div class={[
+      "text-4xl font-bold mb-3",
+      color_class(@color)
+    ]}>
+      {if @total > 0, do: "#{@value}/#{@total}", else: @value}
+    </div>
+    """
+  end
+
+  # Helper component for icon display
+  defp icon_display(assigns) do
+    ~H"""
+    <div class={color_class(@color)}>
+      <.icon name={@icon} class="h-6 w-6" />
+    </div>
+    """
+  end
+
+  # Helper function to get color class
+  defp color_class(color) do
+    case color do
+      "purple" -> "text-secondary"
+      "blue" -> "text-primary"
+      "orange" -> "text-warning"
+      "indigo" -> "text-info"
+      "violet" -> "text-secondary"
+      "yellow" -> "text-warning"
+      "white" -> ""
+      _ -> "text-secondary"
+    end
   end
 end
