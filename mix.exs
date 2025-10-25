@@ -80,7 +80,8 @@ defmodule Jamie.MixProject do
       "ecto.reset": ["ecto.drop", "ecto.setup"],
       test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"],
       "assets.setup": ["tailwind.install --if-missing", "esbuild.install --if-missing"],
-      "assets.build": ["compile", "tailwind jamie", "esbuild jamie"],
+      "assets.build": ["compile", "tailwind jamie", "esbuild jamie", "copy.images"],
+      "copy.images": &copy_images/1,
       "assets.deploy": [
         "tailwind jamie --minify",
         "esbuild jamie --minify",
@@ -88,5 +89,22 @@ defmodule Jamie.MixProject do
       ],
       precommit: ["compile --warning-as-errors", "deps.unlock --unused", "format", "test"]
     ]
+  end
+
+  defp copy_images(_) do
+    File.mkdir_p!("priv/static/images")
+
+    # Copy all images from assets/images to priv/static/images
+    case File.ls("assets/images") do
+      {:ok, files} ->
+        Enum.each(files, fn file ->
+          if Path.extname(file) in [".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp"] do
+            File.cp!("assets/images/#{file}", "priv/static/images/#{file}")
+            Mix.shell().info("Copied #{file} to priv/static/images/")
+          end
+        end)
+      {:error, :enoent} ->
+        Mix.shell().info("No assets/images directory found, skipping image copy")
+    end
   end
 end
