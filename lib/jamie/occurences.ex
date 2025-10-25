@@ -508,6 +508,15 @@ defmodule Jamie.Occurences do
   Creates a participant.
   """
   def create_participant(attrs \\ %{}) do
+    # If user_id is provided, use it; otherwise create participant with contact info only
+    attrs =
+      if attrs["user_id"] do
+        attrs
+      else
+        # Remove user_id if it's empty or nil
+        Map.delete(attrs, "user_id")
+      end
+
     %Participant{}
     |> Participant.changeset(attrs)
     |> Repo.insert()

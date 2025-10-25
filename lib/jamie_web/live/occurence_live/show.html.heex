@@ -8,15 +8,15 @@
       </div>
 
       <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl overflow-hidden border border-base-300">
-        <%!-- Header with photo or gradient --%>
-        <%= if @occurence.photo_url do %>
-          <div class="relative h-48 sm:h-64">
-            <img src={@occurence.photo_url} alt={@occurence.title} class="w-full h-full object-cover" />
-            <div class="absolute inset-0 bg-gradient-to-t from-base-100/50 to-transparent"></div>
-          </div>
-        <% else %>
-          <div class="h-48 sm:h-64 bg-gradient-to-r from-primary to-secondary flex items-center justify-center"></div>
-        <% end %>
+        <%!-- Header with photo or default image --%>
+        <div class="relative h-48 sm:h-64">
+          <img
+            src={@occurence.photo_url || "/images/acroyoga-default-header.png"}
+            alt={@occurence.title}
+            class="w-full h-full object-cover"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-base-100/50 to-transparent"></div>
+        </div>
 
         <%!-- Content --%>
         <div class="p-6 sm:p-8">

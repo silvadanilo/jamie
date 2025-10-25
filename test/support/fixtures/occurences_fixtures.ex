@@ -35,7 +35,9 @@ defmodule Jamie.OccurencesFixtures do
         status: "confirmed",
         role: "base",
         notes: nil,
-        nickname: nil
+        nickname: nil,
+        name: "Test User",
+        email: "test@example.com"
       })
       |> Jamie.Occurences.register_participant()
 

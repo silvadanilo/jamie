@@ -5,20 +5,6 @@ defmodule JamieWeb.TableWaitlistRow do
   use Phoenix.Component
   import JamieWeb.CoreComponents
 
-  @doc """
-  Renders a waitlist participant row that fits within a table structure.
-
-  ## Examples
-
-      <.table_waitlist_row
-        participant={participant}
-        index={1}
-        actions={[
-          %{type: :promote, event: "promote_from_waitlist", id: participant.id, icon: "hero-arrow-up", color: "teal"},
-          %{type: :delete, event: "delete", id: participant.id, icon: "hero-x-mark", color: "red", confirm: "Are you sure?"}
-        ]}
-      />
-  """
   attr :participant, :map, required: true, doc: "The participant data"
   attr :index, :integer, required: true, doc: "The position in the waitlist"
   attr :actions, :list, default: [], doc: "List of action button configurations"
@@ -41,10 +27,10 @@ defmodule JamieWeb.TableWaitlistRow do
             <div class="flex items-center gap-2 mb-1">
               <span class="text-orange-500 font-bold text-lg">#{@index}</span>
               <p class="text-base-content font-semibold text-lg">
-                {@participant.user.name} {@participant.user.surname}
+                {display_name(@participant)}
               </p>
             </div>
-            <p class="text-base-content/70 text-sm">{@participant.user.phone || "—"}</p>
+            <p class="text-base-content/70 text-sm">{display_contact(@participant)}</p>
           </div>
         </div>
         <div class="flex items-center gap-4 mb-3">
@@ -119,14 +105,14 @@ defmodule JamieWeb.TableWaitlistRow do
           <% end %>
         </div>
       </div>
-
+      
     <!-- Desktop Layout - Table Structure -->
       <div class="hidden md:grid grid-cols-[auto_2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center">
         <div class="text-orange-500 font-bold text-xl">#{@index}</div>
         <div class="text-base-content font-semibold text-lg">
-          {@participant.user.name} {@participant.user.surname}
+          {display_name(@participant)}
         </div>
-        <div class="text-base-content/70">{@participant.user.phone || "—"}</div>
+        <div class="text-base-content/70">{display_contact(@participant)}</div>
         <div>
           <%= if @editing_role do %>
             <div class="flex items-center gap-2">
@@ -199,5 +185,30 @@ defmodule JamieWeb.TableWaitlistRow do
       </div>
     </div>
     """
+  end
+
+  defp display_name(participant) do
+    cond do
+      participant.name ->
+        if participant.surname, do: "#{participant.name} #{participant.surname}", else: participant.name
+
+      participant.user ->
+        if participant.user.surname,
+          do: "#{participant.user.name} #{participant.user.surname}",
+          else: participant.user.name
+
+      true ->
+        "Unknown"
+    end
+  end
+
+  defp display_contact(participant) do
+    cond do
+      participant.phone -> participant.phone
+      participant.email -> participant.email
+      participant.user && participant.user.phone -> participant.user.phone
+      participant.user && participant.user.email -> participant.user.email
+      true -> "—"
+    end
   end
 end

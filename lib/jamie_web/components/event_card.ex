@@ -31,9 +31,9 @@ defmodule JamieWeb.EventCard do
       "card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105",
       @class
     ]}>
-      <figure :if={@occurence.photo_url} class="h-48 overflow-hidden">
+      <figure class="h-48 overflow-hidden">
         <img
-          src={@occurence.photo_url}
+          src={@occurence.photo_url || "/images/acroyoga-default-header.png"}
           alt={@occurence.title}
           class="w-full h-full object-cover"
         />

@@ -5,18 +5,6 @@ defmodule JamieWeb.TableParticipantRow do
   use Phoenix.Component
   import JamieWeb.CoreComponents
 
-  @doc """
-  Renders a participant row that fits within a table structure.
-
-  ## Examples
-
-      <.table_participant_row
-        participant={participant}
-        actions={[
-          %{type: :delete, event: "delete", id: participant.id, icon: "hero-x-mark", color: "red", confirm: "Are you sure?"}
-        ]}
-      />
-  """
   attr :participant, :map, required: true, doc: "The participant data"
   attr :actions, :list, default: [], doc: "List of action button configurations"
   attr :variant, :string, default: "default", values: ["default", "cancelled"], doc: "The row variant"
@@ -40,14 +28,14 @@ defmodule JamieWeb.TableParticipantRow do
               "font-semibold text-lg",
               @variant == "cancelled" && "text-base-content/60"
             ]}>
-              {@participant.user.name} {@participant.user.surname}
+              {display_name(@participant)}
             </p>
             <p class={[
               "text-sm mt-1",
               @variant == "cancelled" && "text-base-content/50",
               @variant != "cancelled" && "text-base-content/70"
             ]}>
-              {@participant.user.phone || "—"}
+              {display_contact(@participant)}
             </p>
           </div>
           <div class="flex gap-2">
@@ -129,20 +117,20 @@ defmodule JamieWeb.TableParticipantRow do
           </span>
         </div>
       </div>
-
+      
     <!-- Desktop Layout - Table Structure -->
       <div class="hidden md:grid grid-cols-[2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center">
         <div class={[
           "font-semibold text-lg",
           @variant == "cancelled" && "text-base-content/60"
         ]}>
-          {@participant.user.name} {@participant.user.surname}
+          {display_name(@participant)}
         </div>
         <div class={[
           @variant == "cancelled" && "text-base-content/50",
           @variant != "cancelled" && "text-base-content/70"
         ]}>
-          {@participant.user.phone || "—"}
+          {display_contact(@participant)}
         </div>
         <div>
           <%= if @editing_role do %>
@@ -223,5 +211,30 @@ defmodule JamieWeb.TableParticipantRow do
       </div>
     </div>
     """
+  end
+
+  defp display_name(participant) do
+    cond do
+      participant.name ->
+        if participant.surname, do: "#{participant.name} #{participant.surname}", else: participant.name
+
+      participant.user ->
+        if participant.user.surname,
+          do: "#{participant.user.name} #{participant.user.surname}",
+          else: participant.user.name
+
+      true ->
+        "Unknown"
+    end
+  end
+
+  defp display_contact(participant) do
+    cond do
+      participant.phone -> participant.phone
+      participant.email -> participant.email
+      participant.user && participant.user.phone -> participant.user.phone
+      participant.user && participant.user.email -> participant.user.email
+      true -> "—"
+    end
   end
 end

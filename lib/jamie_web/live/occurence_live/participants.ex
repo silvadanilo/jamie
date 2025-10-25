@@ -68,7 +68,7 @@ defmodule JamieWeb.OccurenceLive.Participants do
                         label="Email"
                         placeholder="Enter email address"
                       />
-                      <p class="text-sm text-base-content/60 mt-1">Optional - will be auto-generated if not provided</p>
+                      <p class="text-sm text-base-content/60 mt-1">Optional - either email or phone is required</p>
                     </div>
                     <div>
                       <.input
@@ -601,35 +601,20 @@ defmodule JamieWeb.OccurenceLive.Participants do
   def handle_event("save", %{"participant" => participant_params}, socket) do
     occurence = socket.assigns.occurence
 
-    # Create a user for the participant if they don't exist
-    user_params = %{
-      "name" => participant_params["name"],
-      "surname" => participant_params["surname"],
-      "email" =>
-        participant_params["email"] || "#{participant_params["name"]}.#{participant_params["surname"]}@example.com",
-      "phone" => participant_params["phone"]
-    }
+    # Create participant directly with contact info (no user creation)
+    participant_params =
+      participant_params
+      |> Map.put("occurence_id", occurence.id)
+      |> Map.put("status", "confirmed")
 
-    # Create or get user
-    case Occurences.create_or_get_user_for_participant(user_params) do
-      {:ok, user} ->
-        # Create participant
-        participant_params = Map.put(participant_params, "user_id", user.id)
-        participant_params = Map.put(participant_params, "occurence_id", occurence.id)
-        participant_params = Map.put(participant_params, "status", "confirmed")
+    case Occurences.create_participant(participant_params) do
+      {:ok, _participant} ->
+        socket =
+          socket
+          |> put_flash(:info, "Participant added successfully")
+          |> push_navigate(to: ~p"/occurences/#{occurence.id}/participants")
 
-        case Occurences.create_participant(participant_params) do
-          {:ok, _participant} ->
-            socket =
-              socket
-              |> put_flash(:info, "Participant added successfully")
-              |> push_navigate(to: ~p"/occurences/#{occurence.id}/participants")
-
-            {:noreply, socket}
-
-          {:error, changeset} ->
-            {:noreply, assign(socket, :form, to_form(changeset))}
-        end
+        {:noreply, socket}
 
       {:error, changeset} ->
         {:noreply, assign(socket, :form, to_form(changeset))}
