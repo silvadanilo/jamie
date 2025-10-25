@@ -61,8 +61,8 @@ defmodule JamieWeb.Layouts do
               </.link>
             </li>
             <li class="dropdown dropdown-end">
-              <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold">
+              <div tabindex="0" role="button" class="cursor-pointer">
+                <div class="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold text-base">
                   {String.first(@current_scope.email) |> String.upcase()}
                 </div>
               </div>

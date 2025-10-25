@@ -123,13 +123,41 @@ defmodule JamieWeb.OccurenceLive.Show do
               <div :if={@occurence.show_partecipant_list} class="mb-8">
                 <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
                   <.icon name="hero-users" class="h-5 w-5" />
-                  Participants
+                  Participants ({length(@participants)} registered)
                 </h2>
                 <div class="bg-base-200 rounded-xl p-4">
-                  <%!-- TODO: Implement participant list when participants feature is added --%>
-                  <p class="text-base-content/60 text-center py-4">
-                    Participant list will be displayed here
-                  </p>
+                  <%= if @participants == [] do %>
+                    <p class="text-base-content/60 text-center py-4">
+                      No participants yet. Be the first to register!
+                    </p>
+                  <% else %>
+                    <div class="grid sm:grid-cols-2 gap-3">
+                      <div
+                        :for={participant <- @participants}
+                        class="flex items-center gap-3 p-3 bg-base-100 rounded-lg"
+                      >
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold text-base">
+                          {String.upcase(String.first(participant.nickname || participant.user.name || "?"))}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                          <div class="font-semibold truncate">
+                            {participant.nickname || participant.user.name}
+                          </div>
+                          <div class="flex items-center gap-2 text-sm text-base-content/70">
+                            <span class="badge badge-sm badge-ghost">
+                              {String.capitalize(participant.role)}
+                            </span>
+                            <span
+                              :if={participant.status == "waitlist"}
+                              class="badge badge-sm badge-warning"
+                            >
+                              Waitlist
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
                 </div>
               </div>
 
@@ -164,7 +192,11 @@ defmodule JamieWeb.OccurenceLive.Show do
 
   def mount(%{"slug" => slug}, _session, socket) do
     occurence = Occurences.get_occurence_by_slug!(slug)
+    participants = Occurences.list_participants(occurence.id, "confirmed")
 
-    {:ok, assign(socket, :occurence, occurence)}
+    {:ok,
+     socket
+     |> assign(:occurence, occurence)
+     |> assign(:participants, participants)}
   end
 end

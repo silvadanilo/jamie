@@ -331,5 +331,42 @@ defmodule Jamie.OccurencesTest do
 
       refute Occurences.user_registered?(occurence.id, participant_user.id)
     end
+
+    test "list_participants/2 filters by status when provided" do
+      user = user_fixture()
+      occurence = occurence_fixture(%{created_by_id: user.id, base_capacity: 2})
+
+      # Add confirmed participant
+      confirmed_user = user_fixture()
+      Occurences.register_participant(%{
+        occurence_id: occurence.id,
+        user_id: confirmed_user.id,
+        status: "confirmed",
+        role: "base"
+      })
+
+      # Add waitlist participant
+      waitlist_user = user_fixture()
+      Occurences.register_participant(%{
+        occurence_id: occurence.id,
+        user_id: waitlist_user.id,
+        status: "waitlist",
+        role: "base"
+      })
+
+      # List all participants
+      all_participants = Occurences.list_participants(occurence.id)
+      assert length(all_participants) == 2
+
+      # List only confirmed
+      confirmed_participants = Occurences.list_participants(occurence.id, "confirmed")
+      assert length(confirmed_participants) == 1
+      assert hd(confirmed_participants).status == "confirmed"
+
+      # List only waitlist
+      waitlist_participants = Occurences.list_participants(occurence.id, "waitlist")
+      assert length(waitlist_participants) == 1
+      assert hd(waitlist_participants).status == "waitlist"
+    end
   end
 end

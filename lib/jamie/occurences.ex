@@ -374,11 +374,22 @@ defmodule Jamie.Occurences do
 
   @doc """
   Lists all participants for an event with user preloaded.
+  Optionally filters by status if provided.
   """
-  def list_participants(occurence_id) do
-    Participant
-    |> where([p], p.occurence_id == ^occurence_id)
-    |> order_by([p], asc: p.inserted_at)
+  def list_participants(occurence_id, status \\ nil) do
+    query =
+      Participant
+      |> where([p], p.occurence_id == ^occurence_id)
+      |> order_by([p], asc: p.inserted_at)
+
+    query =
+      if status do
+        where(query, [p], p.status == ^status)
+      else
+        query
+      end
+
+    query
     |> preload(:user)
     |> Repo.all()
   end
