@@ -3,8 +3,6 @@ defmodule JamieWeb.UserConfirmationLive do
 
   alias Jamie.Accounts
 
-  def render(assigns), do: ~H""
-
   def mount(%{"token" => token}, _session, socket) do
     case Accounts.get_user_by_magic_link_token(token) do
       {:ok, user} ->

@@ -1,0 +1,120 @@
+<Layouts.app flash={@flash} current_scope={@current_user}>
+  <div class="min-h-screen px-4 py-6 sm:py-8">
+    <div class="max-w-2xl mx-auto">
+      <div class="mb-6">
+        <.link navigate={~p"/events/#{@occurence.slug}"} class="btn btn-ghost btn-sm">
+          <.icon name="hero-arrow-left" class="h-4 w-4" /> Back to Event
+        </.link>
+      </div>
+
+      <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
+        <div class="mb-6">
+          <h1 class="text-2xl sm:text-3xl font-bold mb-2">{@occurence.title}</h1>
+          <p class="text-base-content/70">Register for Event</p>
+        </div>
+
+        <%!-- Event summary --%>
+        <div class="bg-base-200 rounded-xl p-4 mb-6">
+          <div class="flex items-center gap-2 text-sm mb-2">
+            <.icon name="hero-calendar-days" class="h-4 w-4 text-primary" />
+            <span>{Calendar.strftime(@occurence.date, "%B %d, %Y at %I:%M %p")}</span>
+          </div>
+          <div :if={@occurence.location} class="flex items-center gap-2 text-sm mb-2">
+            <.icon name="hero-map-pin" class="h-4 w-4 text-primary" />
+            <span>{@occurence.location}</span>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <.icon name="hero-currency-euro" class="h-4 w-4 text-primary" />
+            <%= if @occurence.cost && Decimal.compare(@occurence.cost, Decimal.new(0)) == :gt do %>
+              <span>€{@occurence.cost}</span>
+            <% else %>
+              <span class="badge badge-success gap-1">
+                Free
+              </span>
+            <% end %>
+          </div>
+        </div>
+
+        <%!-- Event description --%>
+        <div :if={@occurence.description} class="bg-base-200 rounded-xl p-4 mb-6">
+          <h3 class="font-semibold mb-2 flex items-center gap-2">
+            <.icon name="hero-document-text" class="h-4 w-4 text-primary" /> Description
+          </h3>
+          <div class="prose prose-sm max-w-none text-base-content/80">
+            {markdown_to_html(@occurence.description)}
+          </div>
+        </div>
+
+        <%!-- Registration status --%>
+        <%= if @is_full do %>
+          <div class="alert alert-warning mb-6">
+            <.icon name="hero-exclamation-triangle" class="h-5 w-5" />
+            <div>
+              <div class="font-semibold">Event is full</div>
+              <div class="text-sm">
+                You will be added to the waitlist and notified if a spot becomes available.
+              </div>
+            </div>
+          </div>
+        <% else %>
+          <div class="alert alert-success mb-6">
+            <.icon name="hero-check-circle" class="h-5 w-5" />
+            <div class="text-sm">Spots are available for this event!</div>
+          </div>
+        <% end %>
+
+        <%!-- Registration form --%>
+        <.form for={@form} id="participant-form" phx-submit="register" class="space-y-4">
+          <.input
+            field={@form[:role]}
+            type="select"
+            label="Preferred Role"
+            options={[
+              {"Base", "base"},
+              {"Flyer", "flyer"}
+            ]}
+          />
+
+          <%= if @occurence.show_partecipant_list do %>
+            <div class="alert alert-info">
+              <.icon name="hero-information-circle" class="h-5 w-5" />
+              <div class="text-sm">
+                This event displays the participant list publicly. <br />Please provide a nickname for display.
+              </div>
+            </div>
+
+            <.input
+              field={@form[:nickname]}
+              type="text"
+              label="Public Nickname"
+              placeholder="How you want to appear in the participant list"
+              required
+            />
+          <% end %>
+
+          <.input
+            field={@form[:notes]}
+            type="textarea"
+            label="Notes (optional, visible to organizers only)"
+            placeholder="Any special requirements or notes..."
+            rows="3"
+          />
+
+          <div class="flex gap-3 pt-4">
+            <button type="submit" class="btn btn-primary flex-1" disabled={@registering}>
+              <%= if @registering do %>
+                <span class="loading loading-spinner loading-sm"></span> Registering...
+              <% else %>
+                <.icon name="hero-check-circle" class="h-5 w-5" />
+                {if @is_full, do: "Join Waitlist", else: "Confirm Registration"}
+              <% end %>
+            </button>
+            <.link navigate={~p"/events/#{@occurence.slug}"} class="btn btn-ghost">
+              Cancel
+            </.link>
+          </div>
+        </.form>
+      </div>
+    </div>
+  </div>
+</Layouts.app>
