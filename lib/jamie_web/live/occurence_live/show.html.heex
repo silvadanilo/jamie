@@ -50,8 +50,10 @@
             <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
               <.icon name="hero-document-text" class="h-5 w-5" /> Description
             </h2>
-            <div class="prose prose-sm max-w-none text-base-content/80">
-              {markdown_to_html(@occurence.description)}
+            <div class="bg-base-200/50 rounded-xl p-4 sm:p-6 border border-base-300/50">
+              <div class="prose prose-sm max-w-none text-base-content/80">
+                {markdown_to_html(@occurence.description)}
+              </div>
             </div>
           </div>
 
@@ -102,6 +104,14 @@
 
           <%!-- Action buttons --%>
           <div class="flex flex-wrap gap-3 pt-6 border-t border-base-300">
+            <%= if @is_organizer do %>
+              <.link
+                navigate={~p"/organizer/occurences/#{@occurence.id}/edit"}
+                class="btn btn-secondary flex-1 sm:flex-none"
+              >
+                <.icon name="hero-pencil" class="h-5 w-5" /> Edit Event
+              </.link>
+            <% end %>
             <%= if @current_user do %>
               <.link
                 navigate={~p"/events/#{@occurence.slug}/register"}

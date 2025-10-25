@@ -12,11 +12,20 @@ defmodule JamieWeb.OccurenceLive.Show do
     base_count = Map.get(counts, "base", 0)
     flyer_count = Map.get(counts, "flyer", 0)
 
+    # Check if current user is an organizer
+    is_organizer =
+      if socket.assigns.current_user do
+        Occurences.can_manage_occurence?(occurence, socket.assigns.current_user)
+      else
+        false
+      end
+
     {:ok,
      socket
      |> assign(:occurence, occurence)
      |> assign(:participants, participants)
      |> assign(:base_count, base_count)
-     |> assign(:flyer_count, flyer_count)}
+     |> assign(:flyer_count, flyer_count)
+     |> assign(:is_organizer, is_organizer)}
   end
 end
