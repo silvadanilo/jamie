@@ -27,7 +27,33 @@ defmodule JamieWeb.ParticipantRow do
   attr :variant, :string, default: "default", values: ["default", "cancelled"], doc: "The row variant"
   attr :class, :string, default: "", doc: "Additional CSS classes"
 
+  defp display_name(participant) do
+    cond do
+      participant.name ->
+        if participant.surname, do: "#{participant.name} #{participant.surname}", else: participant.name
+
+      participant.user ->
+        if participant.user.surname,
+          do: "#{participant.user.name} #{participant.user.surname}",
+          else: participant.user.name
+
+      true ->
+        "Unknown"
+    end
+  end
+
+  defp display_phone(participant) do
+    cond do
+      participant.phone -> participant.phone
+      participant.user && participant.user.phone -> participant.user.phone
+      true -> "—"
+    end
+  end
+
   def participant_row(assigns) do
+    assigns = assign(assigns, :display_name, display_name(assigns.participant))
+    assigns = assign(assigns, :display_phone, display_phone(assigns.participant))
+
     ~H"""
     <div class={[
       "px-4 py-4 md:px-6 hover:bg-base-200 dark:hover:bg-slate-700/20 transition-colors",
@@ -44,7 +70,7 @@ defmodule JamieWeb.ParticipantRow do
                 "font-semibold text-lg",
                 @variant == "cancelled" && "text-base-content/70 dark:text-slate-400"
               ]}>
-                {@participant.user.name} {@participant.user.surname}
+                {@display_name}
               </p>
             </div>
             <p
@@ -61,7 +87,7 @@ defmodule JamieWeb.ParticipantRow do
               @variant == "cancelled" && "text-base-content/60 dark:text-slate-500",
               @variant != "cancelled" && "text-base-content/70 dark:text-slate-400"
             ]}>
-              {@participant.user.phone || "—"}
+              {@display_phone}
             </p>
           </div>
           <div class="flex gap-2">
