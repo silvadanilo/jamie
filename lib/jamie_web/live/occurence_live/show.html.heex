@@ -37,94 +37,13 @@
           </div>
 
           <%!-- Key information grid --%>
-          <div class="grid sm:grid-cols-2 gap-4 mb-8">
-            <div class="flex items-start gap-3 p-4 bg-base-200 rounded-xl">
-              <div class="flex-shrink-0">
-                <.icon name="hero-calendar-days" class="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <div class="text-sm text-base-content/70">Date & Time</div>
-                <div class="font-semibold">
-                  {Calendar.strftime(@occurence.date, "%B %d, %Y")}
-                </div>
-                <div class="text-sm">
-                  {Calendar.strftime(@occurence.date, "%I:%M %p")}
-                </div>
-              </div>
-            </div>
-
-            <div :if={@occurence.location} class="flex items-start gap-3 p-4 bg-base-200 rounded-xl">
-              <div class="flex-shrink-0">
-                <.icon name="hero-map-pin" class="h-6 w-6 text-primary" />
-              </div>
-              <div class="flex-1 min-w-0">
-                <div class="text-sm text-base-content/70">Location</div>
-                <div class="font-semibold">{@occurence.location}</div>
-                <a
-                  :if={@occurence.latitude && @occurence.longitude}
-                  href={"https://www.google.com/maps/search/?api=1&query=#{@occurence.latitude},#{@occurence.longitude}"}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="text-sm text-primary hover:underline flex items-center gap-1 mt-1"
-                >
-                  <.icon name="hero-map" class="h-4 w-4" /> View on Maps
-                </a>
-              </div>
-            </div>
-
-            <%= if @occurence.cost && Decimal.compare(@occurence.cost, Decimal.new(0)) == :gt do %>
-              <div class="flex items-start gap-3 p-4 bg-base-200 rounded-xl">
-                <div class="flex-shrink-0">
-                  <.icon name="hero-currency-euro" class="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <div class="text-sm text-base-content/70">Cost</div>
-                  <div class="font-semibold">€{@occurence.cost}</div>
-                </div>
-              </div>
-            <% end %>
-
-            <div :if={@occurence.show_available_spots && @occurence.base_capacity} class="p-4 bg-base-200 rounded-xl">
-              <div class="text-sm text-base-content/70 mb-4 flex items-center gap-2">
-                <.icon name="hero-user-group" class="h-5 w-5 text-primary" /> Available Spots
-              </div>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <%!-- Base Section --%>
-                <div class="flex flex-col items-center">
-                  <div class="text-white font-bold text-sm mb-1">Base</div>
-                  <% base_available = @occurence.base_capacity - @base_count %>
-                  <div class={[
-                    "px-4 py-2 rounded-lg font-bold text-white text-center min-w-[100px] text-sm",
-                    cond do
-                      base_available == 0 -> "bg-red-500"
-                      base_available < 3 -> "bg-yellow-500"
-                      true -> "bg-teal-500"
-                    end
-                  ]}>
-                    {base_available} / {@occurence.base_capacity}
-                  </div>
-                </div>
-
-                <%!-- Flyer Section --%>
-                <%= if @occurence.flyer_capacity do %>
-                  <div class="flex flex-col items-center">
-                    <div class="text-white font-bold text-sm mb-1">Flyer</div>
-                    <% flyer_available = @occurence.flyer_capacity - @flyer_count %>
-                    <div class={[
-                      "px-4 py-2 rounded-lg font-bold text-white text-center min-w-[100px] text-sm",
-                      cond do
-                        flyer_available == 0 -> "bg-red-500"
-                        flyer_available < 3 -> "bg-yellow-500"
-                        true -> "bg-teal-500"
-                      end
-                    ]}>
-                      {flyer_available} / {@occurence.flyer_capacity}
-                    </div>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-          </div>
+          <.info_grid
+            occurence={@occurence}
+            show_available_spots={@occurence.show_available_spots}
+            base_count={@base_count}
+            flyer_count={@flyer_count}
+            class="mb-8"
+          />
 
           <%!-- Description --%>
           <div :if={@occurence.description} class="mb-8">

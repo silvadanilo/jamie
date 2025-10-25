@@ -87,6 +87,15 @@ defmodule JamieWeb do
       # Core UI components
       import JamieWeb.CoreComponents
 
+      # Custom components
+      import JamieWeb.StatisticsCard
+      import JamieWeb.EventCard
+      import JamieWeb.EmptyState
+      import JamieWeb.InfoGrid
+      import JamieWeb.ParticipantRow
+      import JamieWeb.TableParticipantRow
+      import JamieWeb.TableWaitlistRow
+
       # Common modules used in templates
       alias Phoenix.LiveView.JS
       alias JamieWeb.Layouts
