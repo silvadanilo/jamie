@@ -2,7 +2,9 @@ defmodule JamieWeb.OccurenceLive.Edit do
   use JamieWeb, :live_view
 
   alias Jamie.Occurences
+  alias JamieWeb.OccurenceLive.Form
 
+  @impl true
   def mount(%{"id" => id}, _session, socket) do
     occurence = Occurences.get_occurence!(id)
     user = socket.assigns.current_user
@@ -14,6 +16,7 @@ defmodule JamieWeb.OccurenceLive.Edit do
        socket
        |> assign(:occurence, occurence)
        |> assign(:page_title, "Edit Event")
+       |> assign(:action, :edit)
        |> assign_form(changeset)}
     else
       socket =
@@ -25,49 +28,14 @@ defmodule JamieWeb.OccurenceLive.Edit do
     end
   end
 
-  def handle_event("validate", %{"occurence" => occurence_params}, socket) do
-    # Automatically set show_partecipant_list to false if is_private is false or not set
-    is_private_checked = Map.get(occurence_params, "is_private") == "true"
-
-    # Get the current value from the database/changeset
-    current_changeset = Occurences.change_occurence(socket.assigns.occurence)
-    was_private = Ecto.Changeset.get_field(current_changeset, :is_private) == true
-
-    occurence_params =
-      cond do
-        # Transitioning from not-private to private: force show_partecipant_list to false
-        is_private_checked and not was_private ->
-          Map.put(occurence_params, "show_partecipant_list", "false")
-
-        # Private event is not checked: force show_partecipant_list to false
-        not is_private_checked ->
-          occurence_params
-          |> Map.put("show_partecipant_list", "false")
-          |> Map.put("is_private", "false")
-
-        # Was already private: keep show_partecipant_list as user set it
-        true ->
-          occurence_params
-      end
-
-    changeset =
-      socket.assigns.occurence
-      |> Occurences.change_occurence(occurence_params)
-      |> Map.put(:action, :validate)
-
-    {:noreply, assign_form(socket, changeset)}
+  @impl true
+  def handle_event("validate", params, socket) do
+    Form.handle_validate(params, socket)
   end
 
+  @impl true
   def handle_event("save", %{"occurence" => occurence_params}, socket) do
-    # Ensure show_partecipant_list is false if is_private is false
-    is_private_checked = Map.get(occurence_params, "is_private") == "true"
-
-    occurence_params =
-      if not is_private_checked do
-        Map.put(occurence_params, "show_partecipant_list", "false")
-      else
-        occurence_params
-      end
+    occurence_params = Form.normalize_for_save(occurence_params)
 
     case Occurences.update_occurence(socket.assigns.occurence, occurence_params) do
       {:ok, _occurence} ->
