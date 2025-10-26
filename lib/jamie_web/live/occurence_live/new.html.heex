@@ -2,15 +2,179 @@
   <div class="min-h-screen px-4 py-6 sm:py-8">
     <div class="max-w-3xl mx-auto">
       <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
-        <.live_component
-          module={JamieWeb.OccurenceLive.FormComponent}
-          id={:new}
-          title="Create New Event"
-          action={:new}
-          occurence={@occurence}
-          current_user={@current_user}
-          navigate={~p"/organizer/occurences"}
-        />
+        <.header>
+          Create New Event
+          <:subtitle>Fill in the details for your event</:subtitle>
+        </.header>
+
+        <.simple_form
+          for={@form}
+          id="occurence-form"
+          phx-change="validate"
+          phx-submit="save"
+        >
+          <.input field={@form[:title]} type="text" label="Title" required />
+
+          <.markdown_editor
+            field={@form[:description]}
+            label="Description"
+            rows={5}
+            placeholder="Enter your event description using markdown..."
+          />
+
+          <.input
+            field={@form[:date]}
+            type="datetime-local"
+            label="Date & Time"
+            required
+            step="900"
+          />
+
+          <div class="fieldset mb-4">
+            <label>
+              <span class="label mb-2 text-base">Location</span>
+              <div phx-update="ignore" id="location-autocomplete-wrapper">
+                <input
+                  type="text"
+                  id="location-autocomplete-input"
+                  data-location-id={@form[:location].id}
+                  data-latitude-id={@form[:latitude].id}
+                  data-longitude-id={@form[:longitude].id}
+                  data-place-id={@form[:google_place_id].id}
+                  value={Phoenix.HTML.Form.normalize_value("text", @form[:location].value)}
+                  phx-hook="PlacesAutocomplete"
+                  class="w-full input input-lg text-base min-h-[3rem]"
+                  autocomplete="off"
+                  placeholder="Search for a location..."
+                />
+              </div>
+            </label>
+          </div>
+
+          <input
+            type="hidden"
+            id={@form[:location].id}
+            name={@form[:location].name}
+            value={@form[:location].value || ""}
+          />
+          <input
+            type="hidden"
+            id={@form[:latitude].id}
+            name={@form[:latitude].name}
+            value={@form[:latitude].value || ""}
+          />
+          <input
+            type="hidden"
+            id={@form[:longitude].id}
+            name={@form[:longitude].name}
+            value={@form[:longitude].value || ""}
+          />
+          <input
+            type="hidden"
+            id={@form[:google_place_id].id}
+            name={@form[:google_place_id].name}
+            value={@form[:google_place_id].value || ""}
+          />
+
+          <.input
+            field={@form[:cost]}
+            type="number"
+            label="Cost (€)"
+            step="0.01"
+            min="0"
+          />
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <.input
+              field={@form[:base_capacity]}
+              type="number"
+              label="Base Capacity"
+              min="0"
+              placeholder="Leave empty for unlimited"
+            />
+            <.input
+              field={@form[:flyer_capacity]}
+              type="number"
+              label="Flyer Capacity"
+              min="0"
+              placeholder="Leave empty for unlimited"
+            />
+          </div>
+
+          <.input
+            field={@form[:photo_url]}
+            type="text"
+            label="Photo URL"
+          />
+
+          <.input
+            field={@form[:subscription_message]}
+            type="textarea"
+            label="Subscription Message"
+            phx-debounce="blur"
+            rows="3"
+          />
+
+          <.input
+            field={@form[:cancellation_message]}
+            type="textarea"
+            label="Cancellation Message"
+            phx-debounce="blur"
+            rows="3"
+          />
+
+          <.input
+            field={@form[:sare_message]}
+            type="textarea"
+            label="Share Message"
+            phx-debounce="blur"
+            rows="3"
+          />
+
+          <.input
+            field={@form[:note]}
+            type="textarea"
+            label="Internal Note"
+            phx-debounce="blur"
+            rows="2"
+          />
+
+          <.input
+            field={@form[:show_available_spots]}
+            type="checkbox"
+            label="Show Available Spots"
+          />
+
+          <.input
+            field={@form[:is_private]}
+            type="checkbox"
+            label="Private Event"
+          />
+
+          <%= if Ecto.Changeset.get_field(@form.source, :is_private) do %>
+            <.input
+              field={@form[:show_partecipant_list]}
+              type="checkbox"
+              label="Show Participant List"
+            />
+          <% end %>
+
+          <.input
+            field={@form[:disabled]}
+            type="checkbox"
+            label="Disabled"
+          />
+
+          <:actions>
+            <.button
+              phx-disable-with="Saving..."
+              class="w-full sm:w-auto min-h-14 text-base sm:text-lg"
+              variant="primary"
+            >
+              Create Event
+            </.button>
+          </:actions>
+        </.simple_form>
       </div>
     </div>
   </div>

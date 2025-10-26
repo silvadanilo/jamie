@@ -123,7 +123,7 @@ const MarkdownEditor = {
         'preview', 'side-by-side', 'fullscreen', '|',
         'guide'
       ],
-      previewClass: 'prose prose-sm max-w-none p-4',
+      previewClass: ['prose', 'prose-sm', 'max-w-none', 'p-4'],
       spellChecker: false,
       autosave: {
         enabled: true,
@@ -145,7 +145,7 @@ const MarkdownEditor = {
   },
   
   destroyed() {
-    if (this.editor) {
+    if (this.editor && this.editor.toTextarea) {
       this.editor.toTextarea()
       this.editor = null
     }

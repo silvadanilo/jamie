@@ -611,6 +611,7 @@ defmodule JamieWeb.CoreComponents do
         # Apply strict sanitization using custom scrubber
         sanitized_html = HtmlSanitizeEx.Scrubber.scrub(html, JamieWeb.SafeMarkdownScrubber)
         Phoenix.HTML.raw(sanitized_html)
+
       {:error, _, _} ->
         # If markdown parsing fails, escape the original content
         Phoenix.HTML.html_escape(markdown)

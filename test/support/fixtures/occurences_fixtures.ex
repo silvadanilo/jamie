@@ -9,6 +9,7 @@ defmodule Jamie.OccurencesFixtures do
   def occurence_fixture(attrs \\ %{}) do
     title = Map.get(attrs, :title, unique_occurence_title())
     date = Map.get(attrs, :date, DateTime.add(DateTime.utc_now(), 7, :day))
+    is_private = Map.get(attrs, :is_private, false)
 
     {:ok, occurence} =
       attrs
@@ -18,10 +19,10 @@ defmodule Jamie.OccurencesFixtures do
         location: "Test Studio",
         date: date,
         status: "scheduled",
-        is_private: false,
+        is_private: is_private,
         disabled: false,
         show_available_spots: true,
-        show_partecipant_list: true
+        show_partecipant_list: if(is_private, do: true, else: false)
       })
       |> Jamie.Occurences.create_occurence()
 

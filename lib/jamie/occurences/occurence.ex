@@ -27,7 +27,7 @@ defmodule Jamie.Occurences.Occurence do
     field :note, :string
     field :slug, :string
     field :show_available_spots, :boolean, default: true
-    field :show_partecipant_list, :boolean, default: true
+    field :show_partecipant_list, :boolean, default: false
     field :is_private, :boolean, default: false
 
     belongs_to :created_by, Jamie.Accounts.User
@@ -72,8 +72,20 @@ defmodule Jamie.Occurences.Occurence do
     |> validate_number(:base_capacity, greater_than_or_equal_to: 0)
     |> validate_number(:flyer_capacity, greater_than_or_equal_to: 0)
     |> validate_number(:cost, greater_than_or_equal_to: 0)
+    |> validate_show_participant_list_constraint()
     |> unique_constraint(:slug)
     |> foreign_key_constraint(:created_by_id)
+  end
+
+  defp validate_show_participant_list_constraint(changeset) do
+    is_private = get_field(changeset, :is_private)
+    show_participant_list = get_field(changeset, :show_partecipant_list)
+
+    if show_participant_list == true && is_private != true do
+      add_error(changeset, :show_partecipant_list, "Participant list can only be shown for private events")
+    else
+      changeset
+    end
   end
 
   defp normalize_coordinates(attrs) when is_map(attrs) do

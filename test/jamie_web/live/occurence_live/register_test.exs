@@ -154,6 +154,7 @@ defmodule JamieWeb.OccurenceLive.RegisterTest do
         occurence_fixture(%{
           created_by_id: creator.id,
           date: future_date,
+          is_private: true,
           show_partecipant_list: true,
           slug: "public-list-event"
         })
@@ -173,6 +174,7 @@ defmodule JamieWeb.OccurenceLive.RegisterTest do
         occurence_fixture(%{
           created_by_id: creator.id,
           date: future_date,
+          is_private: true,
           show_partecipant_list: true,
           slug: "nickname-event"
         })
@@ -303,6 +305,7 @@ defmodule JamieWeb.OccurenceLive.RegisterTest do
         occurence_fixture(%{
           created_by_id: creator.id,
           date: future_date,
+          is_private: true,
           show_partecipant_list: true,
           slug: "profile-update-event"
         })
