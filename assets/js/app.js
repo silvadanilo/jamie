@@ -23,6 +23,7 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+import EasyMDE from "easymde"
 
 const PlacesAutocomplete = {
   mounted() {
@@ -106,8 +107,54 @@ const PlacesAutocomplete = {
   }
 }
 
+const MarkdownEditor = {
+  mounted() {
+    const textarea = this.el.querySelector('textarea')
+    if (!textarea) return
+    
+    this.editor = new EasyMDE({
+      element: textarea,
+      toolbar: [
+        'bold', 'italic', 'strikethrough', '|',
+        'heading-1', 'heading-2', 'heading-3', '|',
+        'quote', 'unordered-list', 'ordered-list', '|',
+        'link', 'image', 'code', '|',
+        'horizontal-rule', '|',
+        'preview', 'side-by-side', 'fullscreen', '|',
+        'guide'
+      ],
+      previewClass: 'prose prose-sm max-w-none p-4',
+      spellChecker: false,
+      autosave: {
+        enabled: true,
+        uniqueId: this.el.dataset.fieldId,
+        delay: 1000,
+      },
+      status: ['autosave', 'lines', 'words', 'cursor'],
+      placeholder: textarea.placeholder || 'Enter your description using markdown...',
+      renderingConfig: {
+        singleLineBreaks: false,
+        codeSyntaxHighlighting: true,
+      }
+    })
+    
+    // Sync with LiveView on changes
+    this.editor.codemirror.on('change', () => {
+      textarea.dispatchEvent(new Event('input', { bubbles: true }))
+    })
+  },
+  
+  destroyed() {
+    if (this.editor) {
+      this.editor.toTextarea()
+      this.editor = null
+    }
+  }
+}
+
 const Hooks = {
-  PlacesAutocomplete
+  PlacesAutocomplete,
+  MarkdownEditor
 }
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")

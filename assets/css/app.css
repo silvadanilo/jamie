@@ -6,6 +6,9 @@
 @source "../js";
 @source "../../lib/jamie_web";
 
+/* EasyMDE Markdown Editor Styles */
+@import "../node_modules/easymde/dist/easymde.min.css";
+
 /* A Tailwind plugin that makes "hero-#{ICON}" classes available.
    The heroicons installation itself is managed by your mix.exs */
 @plugin "../vendor/heroicons";

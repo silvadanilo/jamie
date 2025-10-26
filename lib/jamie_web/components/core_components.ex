@@ -1,3 +1,40 @@
+defmodule JamieWeb.SafeMarkdownScrubber do
+  @moduledoc """
+  Custom HTML scrubber for markdown content that only allows safe text formatting.
+  Removes all images, links, scripts, and other potentially harmful content.
+  """
+  require HtmlSanitizeEx.Scrubber.Meta
+  alias HtmlSanitizeEx.Scrubber.Meta
+
+  # Remove CDATA sections and comments
+  Meta.remove_cdata_sections_before_scrub()
+  Meta.strip_comments()
+
+  # Allow only safe text formatting tags with no attributes
+  Meta.allow_tag_with_these_attributes("p", [])
+  Meta.allow_tag_with_these_attributes("br", [])
+  Meta.allow_tag_with_these_attributes("strong", [])
+  Meta.allow_tag_with_these_attributes("b", [])
+  Meta.allow_tag_with_these_attributes("i", [])
+  Meta.allow_tag_with_these_attributes("em", [])
+  Meta.allow_tag_with_these_attributes("u", [])
+  Meta.allow_tag_with_these_attributes("h1", [])
+  Meta.allow_tag_with_these_attributes("h2", [])
+  Meta.allow_tag_with_these_attributes("h3", [])
+  Meta.allow_tag_with_these_attributes("h4", [])
+  Meta.allow_tag_with_these_attributes("h5", [])
+  Meta.allow_tag_with_these_attributes("h6", [])
+  Meta.allow_tag_with_these_attributes("ul", [])
+  Meta.allow_tag_with_these_attributes("ol", [])
+  Meta.allow_tag_with_these_attributes("li", [])
+  Meta.allow_tag_with_these_attributes("blockquote", [])
+  Meta.allow_tag_with_these_attributes("code", [])
+  Meta.allow_tag_with_these_attributes("pre", [])
+
+  # Remove everything else (including img, a, script, etc.)
+  Meta.strip_everything_not_covered()
+end
+
 defmodule JamieWeb.CoreComponents do
   @moduledoc """
   Provides core UI components.
@@ -562,15 +599,21 @@ defmodule JamieWeb.CoreComponents do
   end
 
   @doc """
-  Renders markdown content as HTML.
+  Renders markdown content as HTML with strict security sanitization.
+  Only allows safe text formatting elements. Removes all images, links, scripts, and other potentially harmful content.
   """
   def markdown_to_html(nil), do: ""
   def markdown_to_html(""), do: ""
 
   def markdown_to_html(markdown) when is_binary(markdown) do
     case Earmark.as_html(markdown) do
-      {:ok, html, _} -> Phoenix.HTML.raw(html)
-      {:error, _, _} -> markdown
+      {:ok, html, _} ->
+        # Apply strict sanitization using custom scrubber
+        sanitized_html = HtmlSanitizeEx.Scrubber.scrub(html, JamieWeb.SafeMarkdownScrubber)
+        Phoenix.HTML.raw(sanitized_html)
+      {:error, _, _} ->
+        # If markdown parsing fails, escape the original content
+        Phoenix.HTML.html_escape(markdown)
     end
   end
 end

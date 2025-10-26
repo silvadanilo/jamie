@@ -95,6 +95,7 @@ defmodule JamieWeb do
       import JamieWeb.ParticipantRow
       import JamieWeb.TableParticipantRow
       import JamieWeb.TableWaitlistRow
+      import JamieWeb.MarkdownEditor
 
       # Common modules used in templates
       alias Phoenix.LiveView.JS

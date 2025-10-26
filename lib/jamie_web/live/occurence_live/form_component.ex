@@ -20,12 +20,11 @@ defmodule JamieWeb.OccurenceLive.FormComponent do
       >
         <.input field={@form[:title]} type="text" label="Title" required />
 
-        <.input
+        <.markdown_editor
           field={@form[:description]}
-          type="textarea"
           label="Description"
-          phx-debounce="blur"
-          rows="5"
+          rows={5}
+          placeholder="Enter your event description using markdown..."
         />
 
         <.input
