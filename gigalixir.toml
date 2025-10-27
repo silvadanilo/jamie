@@ -1,0 +1,20 @@
+# Gigalixir Configuration File
+# This file configures how your application is deployed to Gigalixir
+
+[build]
+  # Build command - this will be run on Gigalixir to build your app
+  # Gigalixir will automatically detect Phoenix apps and use mix compile
+  elixir_version = "1.15.0"
+
+[environment]
+  # These environment variables will be set automatically by Gigalixir
+  # You can add custom ones through the gigalixir CLI or web dashboard
+  
+  # Gigalixir automatically provides:
+  # - DATABASE_URL: PostgreSQL database connection string
+  # - SECRET_KEY_BASE: Generated secret for cookies
+  # - PORT: Port to listen on
+  
+  # You'll need to set these manually:
+  # - PHX_HOST: Your app's hostname (e.g., your-app.gigalixir.com)
+  # - POSTMARK_API_KEY: Your Postmark API key for emails

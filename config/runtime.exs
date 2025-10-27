@@ -101,10 +101,27 @@ if config_env() == :prod do
 
   # ## Configuring the mailer
   #
-  # Configure Swoosh with Postmark for production
+  # Configure Swoosh with Mailjet for production
+  # Mailjet Free Plan: 6,000 emails/month (200/day)
+  # Sign up at: https://www.mailjet.com/
+  # Get your API keys from: https://app.mailjet.com/account/api_keys
   config :jamie, Jamie.Mailer,
-    adapter: Swoosh.Adapters.Postmark,
-    api_key: System.get_env("POSTMARK_API_KEY")
+    adapter: Swoosh.Adapters.Mailjet,
+    api_key: System.get_env("MAILJET_API_KEY"),
+    secret: System.get_env("MAILJET_SECRET_KEY")
+
+  # Alternative adapters (commented out):
+  #
+  # Postmark:
+  # config :jamie, Jamie.Mailer,
+  #   adapter: Swoosh.Adapters.Postmark,
+  #   api_key: System.get_env("POSTMARK_API_KEY")
+  #
+  # Mailgun:
+  # config :jamie, Jamie.Mailer,
+  #   adapter: Swoosh.Adapters.Mailgun,
+  #   domain: System.get_env("MAILGUN_DOMAIN"),
+  #   api_key: System.get_env("MAILGUN_API_KEY")
 
   config :swoosh, :api_client, Swoosh.ApiClient.Req
 end

@@ -2,6 +2,9 @@ defmodule Jamie.Repo.Migrations.PopulateCreatorsAsCoorganizers do
   use Ecto.Migration
 
   def up do
+    # Enable pgcrypto extension for UUID generation
+    execute "CREATE EXTENSION IF NOT EXISTS pgcrypto"
+
     # Add all existing occurence creators as coorganizers with is_creator = true
     execute """
     INSERT INTO occurence_coorganizers (

@@ -16,5 +16,9 @@ config :swoosh, local: false
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Force SSL for production
+config :jamie, JamieWeb.Endpoint,
+  force_ssl: [rewrite_on: [:x_forwarded_proto], hsts: true]
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
