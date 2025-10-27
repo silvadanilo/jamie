@@ -55,6 +55,11 @@ defmodule JamieWeb.Layouts do
                 <.icon name="hero-calendar" class="h-4 w-4" /> My Events
               </.link>
             </li>
+            <li class="hidden lg:block">
+              <.link navigate={~p"/users/my-partecipations"} class="btn btn-ghost btn-sm">
+                <.icon name="hero-ticket" class="h-4 w-4" /> My Participations
+              </.link>
+            </li>
             <li class="hidden md:block">
               <.link href={~p"/logout"} method="delete" class="btn btn-ghost btn-sm">
                 <.icon name="hero-arrow-right-on-rectangle" class="h-4 w-4" /> Logout
@@ -76,6 +81,11 @@ defmodule JamieWeb.Layouts do
                 <li class="sm:hidden">
                   <.link navigate={~p"/organizer/occurences"}>
                     <.icon name="hero-calendar" class="h-4 w-4" /> My Events
+                  </.link>
+                </li>
+                <li>
+                  <.link navigate={~p"/users/my-partecipations"}>
+                    <.icon name="hero-ticket" class="h-4 w-4" /> My Participations
                   </.link>
                 </li>
                 <li>

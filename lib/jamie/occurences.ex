@@ -560,4 +560,74 @@ defmodule Jamie.Occurences do
     |> Participant.role_changeset(%{role: role})
     |> Repo.update()
   end
+
+  @doc """
+  Returns all participations for a user, including cancelled ones.
+  Returns a list of occurrences where the user has participated.
+  """
+  def list_user_participations(user_id) do
+    Participant
+    |> where([p], p.user_id == ^user_id)
+    |> preload(:occurence)
+    |> order_by([p], desc: p.inserted_at)
+    |> Repo.all()
+    |> Enum.map(& &1.occurence)
+    |> Enum.reject(&is_nil/1)
+  end
+
+  @doc """
+  Returns upcoming events where the user is participating.
+  """
+  def list_upcoming_user_participations(user_id) do
+    now = DateTime.utc_now()
+
+    Participant
+    |> where([p], p.user_id == ^user_id)
+    |> join(:inner, [p], o in Occurence, on: p.occurence_id == o.id)
+    |> where([p, o], o.date >= ^now)
+    |> preload(:occurence)
+    |> order_by([p, o], asc: o.date)
+    |> Repo.all()
+    |> Enum.map(& &1.occurence)
+  end
+
+  @doc """
+  Returns upcoming participant records where the user is participating.
+  """
+  def list_upcoming_user_participations_with_records(user_id) do
+    now = DateTime.utc_now()
+
+    Participant
+    |> where([p], p.user_id == ^user_id)
+    |> join(:inner, [p], o in Occurence, on: p.occurence_id == o.id)
+    |> where([p, o], o.date >= ^now)
+    |> preload(:occurence)
+    |> order_by([p, o], asc: o.date)
+    |> Repo.all()
+  end
+
+  @doc """
+  Returns past events where the user participated.
+  """
+  def list_past_user_participations(user_id) do
+    now = DateTime.utc_now()
+
+    Participant
+    |> where([p], p.user_id == ^user_id)
+    |> join(:inner, [p], o in Occurence, on: p.occurence_id == o.id)
+    |> where([p, o], o.date < ^now)
+    |> preload(:occurence)
+    |> order_by([p, o], desc: o.date)
+    |> Repo.all()
+    |> Enum.map(& &1.occurence)
+  end
+
+  @doc """
+  Gets the participant record for a user and occurrence.
+  """
+  def get_user_participation(user_id, occurence_id) do
+    Participant
+    |> where([p], p.user_id == ^user_id and p.occurence_id == ^occurence_id)
+    |> Repo.one()
+  end
 end

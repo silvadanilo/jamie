@@ -96,8 +96,10 @@ defmodule JamieWeb.EventCard do
   end
 
   defp is_free?(nil), do: true
+
   defp is_free?(cost) when is_struct(cost, Decimal) do
     Decimal.equal?(cost, Decimal.new("0"))
   end
+
   defp is_free?(_), do: true
 end

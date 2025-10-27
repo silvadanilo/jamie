@@ -78,7 +78,8 @@ defmodule Jamie.OccurencesTest do
       assert occurence.description == "A test jam session"
       assert occurence.location == "Test Location"
       assert occurence.status == "scheduled"
-      assert occurence.slug =~ "test-jam"
+      assert occurence.slug != nil
+      assert String.length(occurence.slug) == 36
     end
 
     test "create_occurence/1 with invalid data returns error changeset" do

@@ -40,7 +40,14 @@ defmodule JamieWeb.EventsLive do
                       <.icon name="hero-x-mark" class="h-5 w-5" />
                     </button>
                   <% end %>
-                  <div id="date-range-picker-container" phx-hook="DateRangePicker" class="relative" phx-update="ignore" data-date-from={@date_from} data-date-to={@date_to}>
+                  <div
+                    id="date-range-picker-container"
+                    phx-hook="DateRangePicker"
+                    class="relative"
+                    phx-update="ignore"
+                    data-date-from={@date_from}
+                    data-date-to={@date_to}
+                  >
                     <input
                       type="text"
                       id="date-range-display"

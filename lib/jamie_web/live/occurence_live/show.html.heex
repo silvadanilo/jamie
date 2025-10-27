@@ -112,17 +112,23 @@
                 <.icon name="hero-pencil" class="h-5 w-5" /> Edit Event
               </.link>
             <% end %>
-            <%= if @current_user do %>
-              <.link
-                navigate={~p"/events/#{@occurence.slug}/register"}
-                class="btn btn-primary flex-1 sm:flex-none"
-              >
-                <.icon name="hero-check-circle" class="h-5 w-5" /> Register for Event
-              </.link>
+            <%= if @user_participation && @user_participation.status in ["confirmed", "waitlist"] && @is_future do %>
+              <button phx-click="unsubscribe" class="btn btn-error flex-1 sm:flex-none">
+                <.icon name="hero-x-circle" class="h-5 w-5" /> Unsubscribe
+              </button>
             <% else %>
-              <.link navigate={~p"/login"} class="btn btn-primary flex-1 sm:flex-none">
-                <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" /> Sign in to Register
-              </.link>
+              <%= if @current_user do %>
+                <.link
+                  navigate={~p"/events/#{@occurence.slug}/register"}
+                  class="btn btn-primary flex-1 sm:flex-none"
+                >
+                  <.icon name="hero-check-circle" class="h-5 w-5" /> Register for Event
+                </.link>
+              <% else %>
+                <.link navigate={~p"/login"} class="btn btn-primary flex-1 sm:flex-none">
+                  <.icon name="hero-arrow-right-on-rectangle" class="h-5 w-5" /> Sign in to Register
+                </.link>
+              <% end %>
             <% end %>
             <button class="btn btn-ghost">
               <.icon name="hero-share" class="h-5 w-5" /> Share

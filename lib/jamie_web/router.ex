@@ -46,6 +46,7 @@ defmodule JamieWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{JamieWeb.UserAuth, :ensure_authenticated}] do
       live "/users/settings", UserSettingsLive, :edit
+      live "/users/my-partecipations", UserParticipationsLive, :index
       live "/events/:slug/register", OccurenceLive.Register, :register
     end
   end
