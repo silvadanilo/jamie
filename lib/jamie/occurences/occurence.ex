@@ -110,30 +110,11 @@ defmodule Jamie.Occurences.Occurence do
   defp maybe_generate_slug(changeset) do
     case get_field(changeset, :slug) do
       nil ->
-        title = get_field(changeset, :title)
-        date = get_field(changeset, :date)
-
-        if title && date do
-          slug = generate_slug(title, date)
-          put_change(changeset, :slug, slug)
-        else
-          changeset
-        end
+        slug = Ecto.UUID.generate()
+        put_change(changeset, :slug, slug)
 
       _slug ->
         changeset
     end
-  end
-
-  defp generate_slug(title, date) do
-    date_part = Calendar.strftime(date, "%Y%m%d")
-
-    slug_base =
-      title
-      |> String.downcase()
-      |> String.replace(~r/[^\w\s-]/, "")
-      |> String.replace(~r/\s+/, "-")
-
-    "#{slug_base}-#{date_part}"
   end
 end
