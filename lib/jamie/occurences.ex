@@ -417,6 +417,39 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
+  Registers or updates a participant for an event.
+  If the user has a cancelled participation, it will be reactivated.
+  """
+  def register_or_update_participant(attrs \\ %{}) do
+    occurence_id = attrs["occurence_id"] || attrs[:occurence_id]
+    user_id = attrs["user_id"] || attrs[:user_id]
+
+    # Check if there's an existing participant record
+    existing_participant = get_participant(occurence_id, user_id)
+
+    if existing_participant do
+      # If there's an existing participant (including cancelled), update it
+      # Update the registered_at timestamp to reflect the new registration date
+      # Clear cancelled_at when reactivating
+      attrs_with_timestamp =
+        attrs
+        |> Map.put("registered_at", DateTime.utc_now() |> DateTime.truncate(:second))
+        |> Map.put("cancelled_at", nil)
+
+      existing_participant
+      |> Participant.changeset(attrs_with_timestamp)
+      |> Repo.update()
+    else
+      # Otherwise, create a new one with registered_at set
+      attrs_with_timestamp =
+        attrs
+        |> Map.put("registered_at", DateTime.utc_now() |> DateTime.truncate(:second))
+
+      register_participant(attrs_with_timestamp)
+    end
+  end
+
+  @doc """
   Lists all participants for an event with user preloaded.
   Optionally filters by status if provided.
   """
@@ -424,7 +457,7 @@ defmodule Jamie.Occurences do
     query =
       Participant
       |> where([p], p.occurence_id == ^occurence_id)
-      |> order_by([p], asc: p.inserted_at)
+      |> order_by([p], asc: fragment("COALESCE(?, ?)", p.registered_at, p.inserted_at))
 
     query =
       if status do
@@ -443,7 +476,10 @@ defmodule Jamie.Occurences do
   """
   def cancel_participant(participant) do
     participant
-    |> Participant.changeset(%{status: "cancelled"})
+    |> Participant.changeset(%{
+      status: "cancelled",
+      cancelled_at: DateTime.utc_now() |> DateTime.truncate(:second)
+    })
     |> Repo.update()
   end
 

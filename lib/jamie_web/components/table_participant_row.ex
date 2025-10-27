@@ -91,7 +91,8 @@ defmodule JamieWeb.TableParticipantRow do
               <span class={[
                 "px-3 py-1 text-sm rounded-lg font-medium",
                 @variant == "cancelled" && "bg-base-200 border border-sky-500/30 text-sky-500",
-                @variant != "cancelled" && "bg-sky-500 text-white"
+                @variant != "cancelled" && @participant.role == "base" && "bg-blue-500 text-white",
+                @variant != "cancelled" && @participant.role == "flyer" && "bg-orange-500 text-white"
               ]}>
                 {String.capitalize(@participant.role)}
               </span>
@@ -113,11 +114,15 @@ defmodule JamieWeb.TableParticipantRow do
             @variant == "cancelled" && "text-base-content/60",
             @variant != "cancelled" && "text-base-content/70"
           ]}>
-            {Calendar.strftime(@participant.inserted_at, "%b %d, %H:%M")}
+            <%= if @variant == "cancelled" do %>
+              Cancelled {Calendar.strftime(@participant.cancelled_at, "%b %d, %H:%M")}
+            <% else %>
+              {Calendar.strftime(@participant.registered_at || @participant.inserted_at, "%b %d, %H:%M")}
+            <% end %>
           </span>
         </div>
       </div>
-      
+
     <!-- Desktop Layout - Table Structure -->
       <div class="hidden md:grid grid-cols-[2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center">
         <div class={[
@@ -166,7 +171,8 @@ defmodule JamieWeb.TableParticipantRow do
               <span class={[
                 "px-3 py-1 text-sm rounded-lg font-medium",
                 @variant == "cancelled" && "bg-base-200 border border-sky-500/30 text-sky-500",
-                @variant != "cancelled" && "bg-sky-500 text-white"
+                @variant != "cancelled" && @participant.role == "base" && "bg-blue-500 text-white",
+                @variant != "cancelled" && @participant.role == "flyer" && "bg-orange-500 text-white"
               ]}>
                 {String.capitalize(@participant.role)}
               </span>
@@ -188,7 +194,11 @@ defmodule JamieWeb.TableParticipantRow do
           @variant == "cancelled" && "text-base-content/60",
           @variant != "cancelled" && "text-base-content/70"
         ]}>
-          {Calendar.strftime(@participant.inserted_at, "%b %d, %H:%M")}
+          <%= if @variant == "cancelled" do %>
+            Cancelled {Calendar.strftime(@participant.updated_at, "%b %d, %H:%M")}
+          <% else %>
+            {Calendar.strftime(@participant.registered_at || @participant.inserted_at, "%b %d, %H:%M")}
+          <% end %>
         </div>
         <div class="flex gap-2">
           <%= for action <- @actions do %>

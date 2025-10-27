@@ -17,6 +17,8 @@ defmodule Jamie.Occurences.Participant do
     field :surname, :string
     field :phone, :string
     field :email, :string
+    field :registered_at, :utc_datetime
+    field :cancelled_at, :utc_datetime
 
     belongs_to :occurence, Jamie.Occurences.Occurence
     belongs_to :user, Jamie.Accounts.User, type: :binary_id
@@ -26,7 +28,20 @@ defmodule Jamie.Occurences.Participant do
 
   def changeset(participant, attrs) do
     participant
-    |> cast(attrs, [:status, :role, :notes, :nickname, :name, :surname, :phone, :email, :occurence_id, :user_id])
+    |> cast(attrs, [
+      :status,
+      :role,
+      :notes,
+      :nickname,
+      :name,
+      :surname,
+      :phone,
+      :email,
+      :occurence_id,
+      :user_id,
+      :registered_at,
+      :cancelled_at
+    ])
     |> validate_required([:occurence_id])
     |> validate_inclusion(:status, @valid_statuses)
     |> validate_inclusion(:role, @valid_roles)

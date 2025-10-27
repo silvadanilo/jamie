@@ -64,7 +64,11 @@ defmodule JamieWeb.TableWaitlistRow do
             </div>
           <% else %>
             <div class="flex items-center gap-2">
-              <span class="px-3 py-1 bg-sky-500 text-white text-sm rounded-lg font-medium">
+              <span class={[
+                "px-3 py-1 text-sm rounded-lg font-medium",
+                @participant.role == "base" && "bg-blue-500 text-white",
+                @participant.role == "flyer" && "bg-orange-500 text-white"
+              ]}>
                 {String.capitalize(@participant.role)}
               </span>
               <%= if @on_start_edit_role do %>
@@ -81,7 +85,7 @@ defmodule JamieWeb.TableWaitlistRow do
             </div>
           <% end %>
           <span class="text-base-content/70 text-sm">
-            {Calendar.strftime(@participant.inserted_at, "%b %d, %H:%M")}
+            {Calendar.strftime(@participant.registered_at || @participant.inserted_at, "%b %d, %H:%M")}
           </span>
         </div>
         <div class="flex gap-2">
@@ -105,7 +109,7 @@ defmodule JamieWeb.TableWaitlistRow do
           <% end %>
         </div>
       </div>
-      
+
     <!-- Desktop Layout - Table Structure -->
       <div class="hidden md:grid grid-cols-[auto_2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center">
         <div class="text-orange-500 font-bold text-xl">#{@index}</div>
@@ -144,7 +148,11 @@ defmodule JamieWeb.TableWaitlistRow do
             </div>
           <% else %>
             <div class="flex items-center gap-2">
-              <span class="px-3 py-1 bg-sky-500 text-white text-sm rounded-lg font-medium">
+              <span class={[
+                "px-3 py-1 text-sm rounded-lg font-medium",
+                @participant.role == "base" && "bg-blue-500 text-white",
+                @participant.role == "flyer" && "bg-orange-500 text-white"
+              ]}>
                 {String.capitalize(@participant.role)}
               </span>
               <%= if @on_start_edit_role do %>

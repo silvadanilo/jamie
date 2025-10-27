@@ -109,11 +109,15 @@ defmodule JamieWeb.ParticipantRow do
             @variant == "cancelled" && "text-base-content/80 dark:text-slate-400",
             @variant != "cancelled" && "text-base-content/70 dark:text-slate-400"
           ]}>
-            {Calendar.strftime(@participant.inserted_at, "%b %d, %H:%M")}
+            <%= if @variant == "cancelled" do %>
+              Cancelled {Calendar.strftime(@participant.cancelled_at, "%b %d, %H:%M")}
+            <% else %>
+              {Calendar.strftime(@participant.registered_at || @participant.inserted_at, "%b %d, %H:%M")}
+            <% end %>
           </span>
         </div>
       </div>
-      
+
     <!-- Desktop Layout -->
       <div class="hidden md:grid gap-4 items-center" style={grid_columns(@show_position)}>
         <div :if={@show_position} class="text-orange-500 font-bold text-xl">#{@index}</div>
@@ -142,7 +146,11 @@ defmodule JamieWeb.ParticipantRow do
           @variant == "cancelled" && "text-base-content/80 dark:text-slate-400",
           @variant != "cancelled" && "text-base-content/80 dark:text-slate-300"
         ]}>
-          {Calendar.strftime(@participant.inserted_at, "%b %d, %H:%M")}
+          <%= if @variant == "cancelled" do %>
+            Cancelled {Calendar.strftime(@participant.updated_at, "%b %d, %H:%M")}
+          <% else %>
+            {Calendar.strftime(@participant.registered_at || @participant.inserted_at, "%b %d, %H:%M")}
+          <% end %>
         </div>
         <div class="flex gap-2">
           <%= for action <- @actions do %>

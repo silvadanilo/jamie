@@ -18,8 +18,10 @@ defmodule JamieWeb.OccurenceLive.Register do
 
       {:ok, socket}
     else
-      # Check if user is already registered
-      if Occurences.user_registered?(occurence.id, user.id) do
+      # Check if user is already registered (exclude cancelled status)
+      existing_participation = Occurences.get_participant(occurence.id, user.id)
+
+      if existing_participation && existing_participation.status != "cancelled" do
         socket =
           socket
           |> put_flash(:info, "You are already registered for this event.")
@@ -40,6 +42,7 @@ defmodule JamieWeb.OccurenceLive.Register do
              |> assign(:occurence, occurence)
              |> assign(:is_full, false)
              |> assign(:registering, false)
+             |> assign(:existing_participation, existing_participation)
              |> assign_form(initial_params)}
 
           {:error, :full} ->
@@ -48,6 +51,7 @@ defmodule JamieWeb.OccurenceLive.Register do
              |> assign(:occurence, occurence)
              |> assign(:is_full, true)
              |> assign(:registering, false)
+             |> assign(:existing_participation, existing_participation)
              |> assign_form(initial_params)}
         end
       end
@@ -84,7 +88,7 @@ defmodule JamieWeb.OccurenceLive.Register do
 
     socket = assign(socket, :registering, true)
 
-    case Occurences.register_participant(attrs) do
+    case Occurences.register_or_update_participant(attrs) do
       {:ok, _participant} ->
         # Update user's preferred role and nickname if provided
         user_updates = %{}
@@ -102,11 +106,22 @@ defmodule JamieWeb.OccurenceLive.Register do
         end
 
         # TODO: Send email notification
+        existing = socket.assigns.existing_participation
+
         message =
-          if status == "waitlist" do
-            "You have been added to the waitlist. We'll notify you if a spot becomes available."
-          else
-            "Registration successful! You will receive a confirmation email shortly."
+          cond do
+            existing && existing.status == "cancelled" ->
+              if status == "waitlist" do
+                "Your participation has been reactivated! You've been added to the waitlist. We'll notify you if a spot becomes available."
+              else
+                "Your participation has been reactivated! Registration successful!"
+              end
+
+            status == "waitlist" ->
+              "You have been added to the waitlist. We'll notify you if a spot becomes available."
+
+            true ->
+              "Registration successful! You will receive a confirmation email shortly."
           end
 
         {:noreply,
