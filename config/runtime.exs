@@ -101,14 +101,19 @@ if config_env() == :prod do
 
   # ## Configuring the mailer
   #
-  # Configure Swoosh with Mailjet for production
+  # Configure Swoosh with Mailjet for production using SMTP
   # Mailjet Free Plan: 6,000 emails/month (200/day)
   # Sign up at: https://www.mailjet.com/
-  # Get your API keys from: https://app.mailjet.com/account/api_keys
+  # Get your SMTP credentials from: https://app.mailjet.com/account/smtp
   config :jamie, Jamie.Mailer,
-    adapter: Swoosh.Adapters.Mailjet,
-    api_key: System.get_env("MAILJET_API_KEY"),
-    secret: System.get_env("MAILJET_SECRET_KEY")
+    adapter: Swoosh.Adapters.SMTP,
+    relay: "in-v3.mailjet.com",
+    port: 587,
+    username: System.get_env("MAILJET_API_KEY"),
+    password: System.get_env("MAILJET_SECRET_KEY"),
+    ssl: false,
+    tls: :always,
+    auth: :always
 
   # Alternative adapters (commented out):
   #
