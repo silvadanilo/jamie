@@ -1,6 +1,7 @@
 defmodule JamieWeb.MarkdownEditor do
   @moduledoc """
-  A markdown editor component using EasyMDE for rich markdown editing.
+  A simple textarea component for markdown editing.
+  (EasyMDE was removed due to stability issues)
   """
   use Phoenix.Component
 
@@ -12,12 +13,7 @@ defmodule JamieWeb.MarkdownEditor do
 
   def markdown_editor(assigns) do
     ~H"""
-    <div
-      id={"markdown-editor-#{@field.id}"}
-      class={["markdown-editor", @class]}
-      phx-hook="MarkdownEditor"
-      data-field-id={@field.id}
-    >
+    <div class={["fieldset", @class]}>
       <label for={@field.id} class="label">
         <span class="label-text font-semibold">{@label}</span>
         <span class="label-text-alt text-xs text-base-content/60">Supports markdown formatting</span>
