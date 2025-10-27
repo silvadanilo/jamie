@@ -10,7 +10,7 @@
 
       <div class="grid gap-4 sm:gap-6">
         <%!-- Upcoming Participations --%>
-        <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 sm:p-8 border border-base-300">
+        <div class="sm:bg-base-100/80 sm:backdrop-blur-sm sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 sm:border sm:border-base-300">
           <h2 class="text-xl sm:text-2xl font-bold mb-4">Upcoming Events</h2>
           <%= if @upcoming_participations == [] do %>
             <div class="text-center py-12">
@@ -72,7 +72,7 @@
         </div>
 
         <%!-- Past Participations --%>
-        <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 sm:p-8 border border-base-300">
+        <div class="sm:bg-base-100/80 sm:backdrop-blur-sm sm:rounded-3xl sm:shadow-xl p-4 sm:p-8 sm:border sm:border-base-300">
           <h2 class="text-xl sm:text-2xl font-bold mb-4">Past Events</h2>
           <%= if @past_participations == [] do %>
             <div class="text-center py-12">

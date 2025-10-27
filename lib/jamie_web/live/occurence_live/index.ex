@@ -8,12 +8,26 @@ defmodule JamieWeb.OccurenceLive.Index do
     upcoming = Occurences.list_upcoming_occurences(user)
     past = Occurences.list_past_occurences(user)
 
+    # Add participant stats to each occurrence
+    upcoming_with_stats = Enum.map(upcoming, &add_participant_stats/1)
+    past_with_stats = Enum.map(past, &add_participant_stats/1)
+
     socket =
       socket
-      |> assign(:upcoming_occurences, upcoming)
-      |> assign(:past_occurences, past)
+      |> assign(:upcoming_occurences, upcoming_with_stats)
+      |> assign(:past_occurences, past_with_stats)
 
     {:ok, socket}
+  end
+
+  defp add_participant_stats(occurence) do
+    base_confirmed = Occurences.count_confirmed_participants(occurence.id, "base")
+    flyer_confirmed = Occurences.count_confirmed_participants(occurence.id, "flyer")
+
+    Map.merge(occurence, %{
+      base_registered: base_confirmed,
+      flyer_registered: flyer_confirmed
+    })
   end
 
   def handle_event("delete", %{"id" => id}, socket) do

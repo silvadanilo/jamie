@@ -35,17 +35,17 @@ defmodule JamieWeb.Layouts do
 
   def app(assigns) do
     ~H"""
-    <header class="navbar bg-base-100 shadow-md px-4 sm:px-6 lg:px-8 sticky top-0 z-50 backdrop-blur-sm bg-base-100/80">
+    <header class="navbar bg-base-100 shadow-md px-3 sm:px-6 lg:px-8 py-2 sm:py-4 sticky top-0 z-50 backdrop-blur-sm bg-base-100/80">
       <div class="flex-1">
-        <.link navigate={~p"/"} class="flex items-center gap-3 hover:opacity-80 transition-opacity">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-xl">
+        <.link navigate={~p"/"} class="flex items-center gap-2 sm:gap-3 hover:opacity-80 transition-opacity">
+          <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-base sm:text-xl">
             J
           </div>
-          <span class="text-xl font-bold">Jamie</span>
+          <span class="text-base sm:text-xl font-bold hidden sm:inline">Jamie</span>
         </.link>
       </div>
       <div class="flex-none">
-        <ul class="flex items-center gap-2 sm:gap-4">
+        <ul class="flex items-center gap-1 sm:gap-2 md:gap-4">
           <li>
             <.theme_toggle />
           </li>
@@ -67,7 +67,7 @@ defmodule JamieWeb.Layouts do
             </li>
             <li class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="cursor-pointer">
-                <div class="w-10 h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold text-base">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-primary text-primary-content flex items-center justify-center font-semibold text-sm sm:text-base">
                   {String.first(@current_scope.email) |> String.upcase()}
                 </div>
               </div>
@@ -120,15 +120,15 @@ defmodule JamieWeb.Layouts do
       {render_slot(@inner_block)}
     </main>
 
-    <footer class="footer footer-center p-10 bg-base-200 text-base-content mt-auto">
+    <footer class="footer footer-center p-4 sm:p-10 bg-base-200 text-base-content mt-auto">
       <aside>
-        <div class="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-2xl mb-4">
+        <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white font-bold text-lg sm:text-2xl mb-2 sm:mb-4">
           J
         </div>
-        <p class="font-bold">
+        <p class="font-bold text-sm sm:text-base">
           Jamie - Your Jam Session Platform
         </p>
-        <p>Copyright © {DateTime.utc_now().year} - All rights reserved</p>
+        <p class="text-xs sm:text-base">Copyright © {DateTime.utc_now().year} - All rights reserved</p>
       </aside>
     </footer>
 

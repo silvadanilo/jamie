@@ -122,7 +122,7 @@ defmodule JamieWeb.TableParticipantRow do
           </span>
         </div>
       </div>
-
+      
     <!-- Desktop Layout - Table Structure -->
       <div class="hidden md:grid grid-cols-[2fr_1.5fr_1fr_1.5fr_1fr] gap-4 items-center">
         <div class={[

@@ -117,7 +117,7 @@ defmodule JamieWeb.ParticipantRow do
           </span>
         </div>
       </div>
-
+      
     <!-- Desktop Layout -->
       <div class="hidden md:grid gap-4 items-center" style={grid_columns(@show_position)}>
         <div :if={@show_position} class="text-orange-500 font-bold text-xl">#{@index}</div>
