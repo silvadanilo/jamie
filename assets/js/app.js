@@ -109,46 +109,158 @@ const PlacesAutocomplete = {
 
 const MarkdownEditor = {
   mounted() {
+    console.log('EasyMDE: Hook mounted, starting initialization...')
+    console.log('EasyMDE type check:', typeof EasyMDE, EasyMDE)
+    
+    // Delay initialization slightly to ensure DOM is fully ready
+    this.timeout = setTimeout(() => {
+      this.init()
+    }, 50)
+  },
+  
+  init() {
     const textarea = this.el.querySelector('textarea')
-    if (!textarea) return
+    console.log('EasyMDE: Found textarea:', !!textarea, 'Element:', this.el)
     
-    this.editor = new EasyMDE({
-      element: textarea,
-      toolbar: [
-        'bold', 'italic', 'strikethrough', '|',
-        'heading-1', 'heading-2', 'heading-3', '|',
-        'quote', 'unordered-list', 'ordered-list', '|',
-        'link', 'image', 'code', '|',
-        'horizontal-rule', '|',
-        'preview', 'side-by-side', 'fullscreen', '|',
-        'guide'
-      ],
-      previewClass: ['prose', 'prose-sm', 'max-w-none', 'p-4'],
-      spellChecker: false,
-      autosave: {
-        enabled: true,
-        uniqueId: this.el.dataset.fieldId,
-        delay: 1000,
-      },
-      status: ['autosave', 'lines', 'words', 'cursor'],
-      placeholder: textarea.placeholder || 'Enter your description using markdown...',
-      renderingConfig: {
-        singleLineBreaks: false,
-        codeSyntaxHighlighting: true,
-      }
-    })
+    if (!textarea) {
+      console.warn('EasyMDE: No textarea found')
+      return
+    }
     
-    // Sync with LiveView on changes
-    this.editor.codemirror.on('change', () => {
+    // Check if EasyMDE is already initialized - look inside the hook's container
+    const hasEasyMDE = this.el.querySelector('.EasyMDEContainer')
+    console.log('EasyMDE: Checking for existing instance, hasEasyMDE:', !!hasEasyMDE, 'data-easymde-initialized:', textarea.dataset.easymdeInitialized)
+    
+    if (hasEasyMDE || textarea.dataset.easymdeInitialized) {
+      console.warn('EasyMDE: Already initialized on this element, skipping re-initialization')
+      return
+    }
+    
+    // Ensure DOM is ready
+    if (!document.contains(textarea)) {
+      console.warn('EasyMDE: Textarea not in DOM')
+      this.setupFallback(textarea)
+      return
+    }
+    
+    // Check if EasyMDE constructor is available
+    if (typeof EasyMDE === 'undefined') {
+      console.error('EasyMDE: Library not loaded. Setting up fallback.')
+      this.setupFallback(textarea)
+      return
+    }
+    
+    try {
+      console.log('EasyMDE: Creating new instance...')
+      
+      this.editor = new EasyMDE({
+        element: textarea,
+        toolbar: [
+          'bold', 'italic', 'strikethrough', '|',
+          'heading-1', 'heading-2', 'heading-3', '|',
+          'quote', 'unordered-list', 'ordered-list', '|',
+          'link', 'image', 'code', '|',
+          'horizontal-rule', '|',
+          'preview', 'side-by-side', 'fullscreen', '|',
+          'guide'
+        ],
+        previewClass: ['prose', 'prose-sm', 'max-w-none', 'p-4'],
+        spellChecker: false,
+        autosave: {
+          enabled: false, // Disable autosave to prevent crashes
+        },
+        status: ['lines', 'words', 'cursor'],
+        placeholder: textarea.placeholder || 'Enter your description using markdown...',
+        renderingConfig: {
+          singleLineBreaks: false,
+          codeSyntaxHighlighting: true,
+        }
+      })
+      
+      console.log('EasyMDE: Instance created successfully')
+      
+      // Mark as initialized
+      textarea.dataset.easymdeInitialized = 'true'
+      
+      // Sync with LiveView on changes
+      this.editor.codemirror.on('change', () => {
+        if (textarea) {
+          textarea.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      })
+      
+      // Sync editor value to textarea on blur to ensure form submission has latest value
+      this.editor.codemirror.on('blur', () => {
+        if (this.editor && this.editor.value) {
+          textarea.value = this.editor.value()
+          textarea.dispatchEvent(new Event('input', { bubbles: true }))
+        }
+      })
+      
+      console.log('EasyMDE: Setup complete')
+    } catch (error) {
+      console.error('EasyMDE initialization failed with error:', error)
+      console.error('Error stack:', error.stack)
+      this.editor = null
+      this.setupFallback(textarea)
+    }
+  },
+  
+  setupFallback(textarea) {
+    // Fallback: sync textarea directly with LiveView if EasyMDE fails
+    const syncToLiveView = () => {
       textarea.dispatchEvent(new Event('input', { bubbles: true }))
-    })
+    }
+    
+    // Listen to textarea changes and sync
+    this.fallbackHandler = syncToLiveView
+    textarea.addEventListener('input', syncToLiveView)
+    textarea.addEventListener('change', syncToLiveView)
+    
+    // Also sync before form submission
+    textarea.addEventListener('blur', syncToLiveView)
   },
   
   destroyed() {
-    if (this.editor && this.editor.toTextarea) {
-      this.editor.toTextarea()
-      this.editor = null
+    console.log('EasyMDE: Destroying hook...')
+    
+    // Clear timeout if initialization was pending
+    if (this.timeout) {
+      clearTimeout(this.timeout)
+      this.timeout = null
     }
+    
+    const textarea = this.el.querySelector('textarea')
+    
+    if (this.editor) {
+      try {
+        console.log('EasyMDE: Cleaning up editor instance...')
+        // Clean up EasyMDE instance
+        if (this.editor.toTextarea) {
+          this.editor.toTextarea()
+        }
+        if (this.editor.cleanup) {
+          this.editor.cleanup()
+        }
+        this.editor = null
+      } catch (error) {
+        console.error('Error destroying EasyMDE:', error)
+      }
+    }
+    
+    // Remove initialization marker
+    if (textarea) {
+      delete textarea.dataset.easymdeInitialized
+      
+      // Clean up fallback handlers
+      if (this.fallbackHandler) {
+        textarea.removeEventListener('input', this.fallbackHandler)
+        textarea.removeEventListener('change', this.fallbackHandler)
+        this.fallbackHandler = null
+      }
+    }
+    
+    console.log('EasyMDE: Destroyed')
   }
 }
 
@@ -333,10 +445,23 @@ const DateRangePicker = {
   }
 }
 
+const CopyToClipboard = {
+  mounted() {
+    this.handleEvent("copy_to_clipboard", ({ text }) => {
+      navigator.clipboard.writeText(text).then(() => {
+        console.log('Text copied to clipboard')
+      }).catch(err => {
+        console.error('Failed to copy text: ', err)
+      })
+    })
+  }
+}
+
 const Hooks = {
   PlacesAutocomplete,
   MarkdownEditor,
-  DateRangePicker
+  DateRangePicker,
+  CopyToClipboard
 }
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
