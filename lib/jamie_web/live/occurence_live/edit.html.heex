@@ -1,13 +1,9 @@
 <Layouts.app flash={@flash} current_scope={@current_user}>
   <div class="min-h-screen px-4 py-6 sm:py-8">
-    <div class={["max-w-3xl mx-auto", if(@action == :edit, do: "space-y-6")]}>
+    <div class="max-w-3xl mx-auto space-y-6">
       <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
         <.header>
-          <%= if @action == :new do %>
-            Create New Event
-          <% else %>
-            Edit Event
-          <% end %>
+          Edit Event
           <:subtitle>Fill in the details for your event</:subtitle>
         </.header>
 
@@ -175,32 +171,26 @@
               class="w-full sm:w-auto min-h-14 text-base sm:text-lg"
               variant="primary"
             >
-              <%= if @action == :new do %>
-                Create Event
-              <% else %>
-                Save Event
-              <% end %>
+              Save Event
             </.button>
           </:actions>
         </.simple_form>
       </div>
 
-      <%= if @action == :edit do %>
-        <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
-          <div class="flex items-center justify-between">
-            <div>
-              <h3 class="text-xl font-semibold">Co-organizers</h3>
-              <p class="text-sm text-base-content/70 mt-1">Manage who can help organize this event</p>
-            </div>
-            <.link
-              navigate={~p"/organizer/occurences/#{@occurence.id}/coorganizers"}
-              class="btn btn-primary"
-            >
-              <.icon name="hero-users" class="h-5 w-5" /> Manage Co-organizers
-            </.link>
+      <div class="bg-base-100/80 backdrop-blur-sm rounded-3xl shadow-2xl p-6 sm:p-8 border border-base-300">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-xl font-semibold">Co-organizers</h3>
+            <p class="text-sm text-base-content/70 mt-1">Manage who can help organize this event</p>
           </div>
+          <.link
+            navigate={~p"/organizer/occurences/#{@occurence.id}/coorganizers"}
+            class="btn btn-primary"
+          >
+            <.icon name="hero-users" class="h-5 w-5" /> Manage Co-organizers
+          </.link>
         </div>
-      <% end %>
+      </div>
     </div>
   </div>
 </Layouts.app>

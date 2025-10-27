@@ -152,9 +152,191 @@ const MarkdownEditor = {
   }
 }
 
+const DateRangePicker = {
+  mounted() {
+    // Wait for custom elements to be defined
+    if (customElements.get('calendar-range')) {
+      this.initPicker()
+    } else {
+      customElements.whenDefined('calendar-range').then(() => this.initPicker())
+    }
+  },
+  
+  initPicker() {
+    const displayInput = this.el.querySelector('#date-range-display')
+    const calendarElement = this.el.querySelector('calendar-range')
+    const popup = this.el.querySelector('#calendar-popup')
+    const hiddenFromInput = this.el.querySelector('input[name="date_from"]')
+    const hiddenToInput = this.el.querySelector('input[name="date_to"]')
+    
+    console.log('Init picker:', { displayInput, calendarElement, popup, hiddenFromInput, hiddenToInput })
+    
+    if (!calendarElement || !hiddenFromInput || !hiddenToInput || !displayInput) {
+      console.error('Missing required elements for picker')
+      return
+    }
+    
+    const formatDate = (date) => {
+      const year = date.getFullYear()
+      const month = String(date.getMonth() + 1).padStart(2, '0')
+      const day = String(date.getDate()).padStart(2, '0')
+      return `${year}-${month}-${day}`
+    }
+    
+    // Listen to rangeend event
+    const handleRangeEnd = (e) => {
+      console.log('Range end event fired:', e.detail)
+      
+      // Try to get the range from the calendar element
+      const props = calendarElement._props || {}
+      console.log('Props object:', props)
+      
+      // The range is stored in props.value as "YYYY-MM-DD/YYYY-MM-DD"
+      let actualStart = null
+      let actualEnd = null
+      
+      if (props.value && typeof props.value === 'string') {
+        const parts = props.value.split('/')
+        if (parts.length === 2) {
+          actualStart = new Date(parts[0])
+          actualEnd = new Date(parts[1])
+          console.log('Parsed from value string - start:', actualStart, 'end:', actualEnd)
+        }
+      }
+      
+      // Fallback to properties
+      if (!actualStart || !actualEnd) {
+        actualStart = props.start || calendarElement.start
+        actualEnd = props.end || calendarElement.end || e.detail
+      }
+      
+      console.log('Final - start:', actualStart, 'end:', actualEnd)
+      
+      if (actualStart) {
+        hiddenFromInput.value = formatDate(actualStart)
+        console.log('Set date_from to:', hiddenFromInput.value)
+      } else {
+        hiddenFromInput.value = ''
+      }
+      
+      if (actualEnd) {
+        hiddenToInput.value = formatDate(actualEnd)
+        console.log('Set date_to to:', hiddenToInput.value)
+      } else {
+        hiddenToInput.value = ''
+      }
+      
+      // Update display with formatted dates
+      if (actualStart && actualEnd) {
+        const startStr = formatDate(actualStart)
+        const endStr = formatDate(actualEnd)
+        displayInput.value = `${startStr} - ${endStr}`
+        console.log('Display updated to:', displayInput.value)
+        
+        // Update the value attribute to trigger LiveView to re-render the icon
+        displayInput.setAttribute('data-has-range', 'true')
+        
+        // Close popup when complete
+        popup.classList.add('hidden')
+      } else if (actualStart) {
+        displayInput.value = `${formatDate(actualStart)} - ...`
+        displayInput.removeAttribute('data-has-range')
+      } else if (actualEnd) {
+        // Only end date selected
+        displayInput.value = `... - ${formatDate(actualEnd)}`
+        displayInput.removeAttribute('data-has-range')
+      } else {
+        displayInput.value = ''
+        displayInput.removeAttribute('data-has-range')
+      }
+      
+      // Trigger form submission for LiveView
+      setTimeout(() => {
+        console.log('Dispatching change events...')
+        hiddenFromInput.dispatchEvent(new Event('change', { bubbles: true }))
+        hiddenToInput.dispatchEvent(new Event('change', { bubbles: true }))
+      }, 100)
+    }
+    
+    calendarElement.addEventListener('rangeend', handleRangeEnd)
+    
+    // Also listen for change events to show intermediate state
+    const handleChange = (e) => {
+      console.log('Calendar change event')
+    }
+    calendarElement.addEventListener('change', handleChange)
+    
+    // Toggle calendar popup on input click
+    const clickHandler = (e) => {
+      e.stopPropagation()
+      popup.classList.toggle('hidden')
+    }
+    displayInput.addEventListener('click', clickHandler)
+    
+    // Close popup when clicking outside
+    const outsideClickHandler = (e) => {
+      if (!this.el.contains(e.target) && !popup.classList.contains('hidden')) {
+        popup.classList.add('hidden')
+      }
+    }
+    document.addEventListener('click', outsideClickHandler)
+    
+    // Store references
+    this.calendarElement = calendarElement
+    this.handleRangeEnd = handleRangeEnd
+    this.handleChange = handleChange
+    this.clickHandler = clickHandler
+    this.outsideClickHandler = outsideClickHandler
+  },
+  
+  updated() {
+    // Reinitialize if element is recreated
+    if (!this.calendarElement) {
+      if (customElements.get('calendar-range')) {
+        this.initPicker()
+      } else {
+        customElements.whenDefined('calendar-range').then(() => this.initPicker())
+      }
+    } else {
+      // Check if date values were cleared via data attributes
+      const dateFrom = this.el.getAttribute('data-date-from')
+      const dateTo = this.el.getAttribute('data-date-to')
+      const displayInput = this.el.querySelector('#date-range-display')
+      
+      console.log('Updated hook - dateFrom:', dateFrom, 'dateTo:', dateTo)
+      
+      if (displayInput && (!dateFrom || !dateTo)) {
+        displayInput.value = ''
+        console.log('Cleared date range display')
+      }
+    }
+  },
+  
+  destroyed() {
+    if (this.calendarElement) {
+      if (this.handleRangeEnd) {
+        this.calendarElement.removeEventListener('rangeend', this.handleRangeEnd)
+      }
+      if (this.handleChange) {
+        this.calendarElement.removeEventListener('change', this.handleChange)
+      }
+    }
+    if (this.clickHandler) {
+      const displayInput = this.el.querySelector('#date-range-display')
+      if (displayInput) {
+        displayInput.removeEventListener('click', this.clickHandler)
+      }
+    }
+    if (this.outsideClickHandler) {
+      document.removeEventListener('click', this.outsideClickHandler)
+    }
+  }
+}
+
 const Hooks = {
   PlacesAutocomplete,
-  MarkdownEditor
+  MarkdownEditor,
+  DateRangePicker
 }
 
 const csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")

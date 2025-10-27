@@ -8,6 +8,9 @@
       {assigns[:page_title]}
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/css/app.css"} />
+    <link rel="stylesheet" href="https://unpkg.com/cally/dist/cally.css" />
+    <script type="module" src="https://unpkg.com/cally">
+    </script>
     <script
       :if={Application.get_env(:jamie, :google_maps_api_key)}
       src={"https://maps.googleapis.com/maps/api/js?key=#{Application.get_env(:jamie, :google_maps_api_key)}&libraries=places&loading=async"}

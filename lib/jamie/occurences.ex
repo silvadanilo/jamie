@@ -35,7 +35,7 @@ defmodule Jamie.Occurences do
   Sorted from nearest to farthest.
   Optionally filters by search term (title or location).
   """
-  def list_public_occurences(search \\ nil) do
+  def list_public_occurences(search \\ nil, date_from \\ nil, date_to \\ nil) do
     now = DateTime.utc_now()
 
     query =
@@ -53,6 +53,20 @@ defmodule Jamie.Occurences do
           [o],
           ilike(o.title, ^search_pattern) or ilike(o.location, ^search_pattern)
         )
+      else
+        query
+      end
+
+    query =
+      if date_from do
+        where(query, [o], o.date >= ^date_from)
+      else
+        query
+      end
+
+    query =
+      if date_to do
+        where(query, [o], o.date <= ^date_to)
       else
         query
       end
