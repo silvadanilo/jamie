@@ -20,5 +20,10 @@ config :logger, level: :info
 config :jamie, JamieWeb.Endpoint,
   force_ssl: [rewrite_on: [:x_forwarded_proto], hsts: true]
 
+# Reduce Oban worker counts for production (especially for smaller databases)
+# This reduces database connection pressure
+config :jamie, Oban,
+  queues: [default: 1, emails: 1, notifications: 1]
+
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
