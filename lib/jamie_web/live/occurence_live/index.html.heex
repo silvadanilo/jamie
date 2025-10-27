@@ -1,5 +1,5 @@
 <Layouts.app flash={@flash} current_scope={@current_user}>
-  <div class="min-h-screen pb-20 sm:pb-0">
+  <div class="min-h-screen pb-20 sm:pb-0" phx-hook="CopyToClipboard" id="occurences-main">
     <!-- Mobile Header -->
     <div class="sticky top-0 z-40 bg-base-100/95 backdrop-blur-md sm:hidden">
       <div class="flex items-center justify-between px-4 py-3 border-b border-base-300">
@@ -110,6 +110,17 @@
                       </.link>
                       <button
                         type="button"
+                        phx-click="copy_share_message"
+                        phx-value-id={occurence.id}
+                        class="btn btn-md h-12 w-full justify-center gap-2 btn-secondary"
+                      >
+                        <.icon name="hero-clipboard" class="h-5 w-5" />
+                        <span class="font-medium">Copy Share</span>
+                      </button>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                      <button
+                        type="button"
                         phx-click="delete"
                         phx-value-id={occurence.id}
                         data-confirm="Are you sure you want to delete this event?"
@@ -180,6 +191,15 @@
                       >
                         <.icon name="hero-users" class="h-6 w-6" />
                       </.link>
+                      <button
+                        type="button"
+                        phx-click="copy_share_message"
+                        phx-value-id={occurence.id}
+                        class="btn btn-sm h-12 w-12 border-2 border-base-content/20 hover:border-secondary bg-base-content/5 hover:bg-secondary/10 text-base-content hover:text-secondary flex items-center justify-center"
+                        title="Copy Share Message"
+                      >
+                        <.icon name="hero-clipboard" class="h-6 w-6" />
+                      </button>
                       <button
                         type="button"
                         phx-click="delete"
