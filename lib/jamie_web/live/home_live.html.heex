@@ -26,26 +26,28 @@
                   <.icon name="hero-plus" class="h-5 w-5" /> Create Event
                 </.link>
               </div>
-              <.link
-                navigate={~p"/events"}
-                class="btn btn-primary btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 w-full sm:w-full"
-              >
-                <.icon name="hero-magnifying-glass" class="h-5 w-5" /> Browse all the events
-              </.link>
             <% else %>
-              <.link
-                navigate={~p"/register"}
-                class="btn btn-primary btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200"
-              >
-                Get Started <.icon name="hero-arrow-right" class="h-5 w-5 ml-2" />
-              </.link>
-              <.link
-                navigate={~p"/login"}
-                class="btn btn-outline btn-lg hover:scale-105 transition-all duration-200"
-              >
-                Sign In
-              </.link>
+              <div class="flex flex-col sm:flex-row gap-4 justify-center w-full">
+                <.link
+                  navigate={~p"/register"}
+                  class="btn btn-primary btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 w-full sm:w-auto"
+                >
+                  Get Started <.icon name="hero-arrow-right" class="h-5 w-5 ml-2" />
+                </.link>
+                <.link
+                  navigate={~p"/login"}
+                  class="btn btn-outline btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 w-full sm:w-auto"
+                >
+                  Sign In
+                </.link>
+              </div>
             <% end %>
+            <.link
+              navigate={~p"/events"}
+              class="btn btn-primary btn-lg shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-200 w-full sm:w-full"
+            >
+              <.icon name="hero-magnifying-glass" class="h-5 w-5" /> Browse all the events
+            </.link>
           </div>
         </div>
       </div>
