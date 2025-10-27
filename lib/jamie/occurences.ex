@@ -143,6 +143,35 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
+  Prepares attributes for duplicating an occurrence.
+  Returns a map with atom keys for creating a new struct.
+  Excludes date/time and other temporal fields.
+  """
+  def prepare_duplicate_attrs(%Occurence{} = occurence) do
+    %{
+      title: occurence.title,
+      description: occurence.description,
+      location: occurence.location,
+      latitude: occurence.latitude,
+      longitude: occurence.longitude,
+      google_place_id: occurence.google_place_id,
+      cost: occurence.cost,
+      photo_url: occurence.photo_url,
+      base_capacity: occurence.base_capacity,
+      flyer_capacity: occurence.flyer_capacity,
+      subscription_message: occurence.subscription_message,
+      cancellation_message: occurence.cancellation_message,
+      share_message: occurence.share_message,
+      note: occurence.note,
+      show_available_spots: occurence.show_available_spots,
+      show_partecipant_list: occurence.show_partecipant_list,
+      is_private: occurence.is_private,
+      disabled: false,
+      status: "scheduled"
+    }
+  end
+
+  @doc """
   Updates the status of an occurence.
   """
   def update_occurence_status(%Occurence{} = occurence, status)

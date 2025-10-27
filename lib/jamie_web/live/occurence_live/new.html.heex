@@ -3,10 +3,13 @@
     <div class={["max-w-3xl mx-auto", if(@action == :edit, do: "space-y-6")]}>
       <div class="sm:bg-base-100/80 sm:backdrop-blur-sm sm:rounded-3xl sm:shadow-2xl p-4 sm:p-8 sm:border sm:border-base-300">
         <.header>
-          <%= if @action == :new do %>
-            Create New Event
-          <% else %>
-            Edit Event
+          <%= cond do %>
+            <% @is_duplicate == true -> %>
+              Duplicate Event
+            <% @action == :new -> %>
+              Create New Event
+            <% true -> %>
+              Edit Event
           <% end %>
           <:subtitle>Fill in the details for your event</:subtitle>
         </.header>

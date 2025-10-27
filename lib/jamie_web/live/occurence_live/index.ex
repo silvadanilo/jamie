@@ -49,6 +49,19 @@ defmodule JamieWeb.OccurenceLive.Index do
     end
   end
 
+  def handle_event("duplicate", %{"id" => id}, socket) do
+    occurence = Occurences.get_occurence!(id)
+    user = socket.assigns.current_user
+
+    if Occurences.can_manage_occurence?(occurence, user) do
+      {:noreply,
+       socket
+       |> push_navigate(to: ~p"/organizer/occurences/new?dup_id=#{id}")}
+    else
+      {:noreply, put_flash(socket, :error, "You are not authorized to duplicate this event")}
+    end
+  end
+
   def handle_event("copy_share_message", %{"id" => id}, socket) do
     occurence = Occurences.get_occurence!(id)
     user = socket.assigns.current_user
