@@ -40,7 +40,12 @@ defmodule JamieWeb.EventCard do
       </figure>
 
       <div class="card-body">
-        <h3 class="card-title text-xl">{@occurence.title}</h3>
+        <div class="flex items-center gap-2 mb-1">
+          <h3 class="card-title text-xl flex-1">{@occurence.title}</h3>
+          <span :if={is_free?(@occurence.cost)} class="badge badge-success badge-sm text-xs font-normal gap-1">
+            <.icon name="hero-currency-euro" class="h-3 w-3" /> Free
+          </span>
+        </div>
 
         <div class="space-y-2 text-sm text-base-content/70">
           <div class="flex items-center gap-2">
@@ -89,4 +94,10 @@ defmodule JamieWeb.EventCard do
     </div>
     """
   end
+
+  defp is_free?(nil), do: true
+  defp is_free?(cost) when is_struct(cost, Decimal) do
+    Decimal.equal?(cost, Decimal.new("0"))
+  end
+  defp is_free?(_), do: true
 end
