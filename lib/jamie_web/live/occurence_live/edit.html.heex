@@ -139,31 +139,49 @@
             rows="2"
           />
 
-          <.input
-            field={@form[:show_available_spots]}
-            type="checkbox"
-            label="Show Available Spots"
-          />
+          <div class="mb-4">
+            <.input
+              field={@form[:show_available_spots]}
+              type="checkbox"
+              label="Show Available Spots"
+            />
+            <p class="text-sm text-base-content/70 pl-14 mt-1">
+              Display the number of available spots and registered participants to users
+            </p>
+          </div>
 
-          <.input
-            field={@form[:is_private]}
-            type="checkbox"
-            label="Private Event"
-          />
+          <div class="mb-4">
+            <.input
+              field={@form[:is_private]}
+              type="checkbox"
+              label="Private Event"
+            />
+            <p class="text-sm text-base-content/70 pl-14 mt-1">
+              Only users with the event link can see and subscribe to this event
+            </p>
+          </div>
 
           <%= if Ecto.Changeset.get_field(@form.source, :is_private) do %>
-            <.input
-              field={@form[:show_partecipant_list]}
-              type="checkbox"
-              label="Show Participant List"
-            />
+            <div class="mb-4">
+              <.input
+                field={@form[:show_partecipant_list]}
+                type="checkbox"
+                label="Show Participant List"
+              />
+              <p class="text-sm text-base-content/70 pl-14 mt-1">
+                Display the list of participants (with nicknames) to registered users
+              </p>
+            </div>
           <% end %>
 
-          <.input
-            field={@form[:disabled]}
-            type="checkbox"
-            label="Disabled"
-          />
+          <div class="mb-4">
+            <.input
+              field={@form[:disabled]}
+              type="checkbox"
+              label="Disabled"
+            />
+            <p class="text-sm text-base-content/70 pl-14 mt-1">Hide this event from public view</p>
+          </div>
 
           <:actions>
             <.button
