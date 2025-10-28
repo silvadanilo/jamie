@@ -107,13 +107,15 @@ if config_env() == :prod do
   # Get your SMTP credentials from: https://app.mailjet.com/account/smtp
   config :jamie, Jamie.Mailer,
     adapter: Swoosh.Adapters.SMTP,
-    relay: "in-v3.mailjet.com",
+    relay: "in.mailjet.com",
     port: 587,
     username: System.get_env("MAILJET_API_KEY"),
     password: System.get_env("MAILJET_SECRET_KEY"),
     ssl: false,
-    tls: :always,
-    auth: :always
+    tls: :if_available,
+    auth: :always,
+    retries: 2,
+    no_mx_lookups: false
 
   # Alternative adapters (commented out):
   #
