@@ -9,10 +9,13 @@ Changed the email configuration to use SMTP instead of the Mailjet REST API, whi
 ## Changes Made
 
 ### 1. `mix.exs`
-Added the `mail` package dependency which is required by Swoosh's SMTP adapter:
+Added the required dependencies for Swoosh's SMTP adapter:
 ```elixir
 {:mail, "~> 0.3"},
+{:gen_smtp, "~> 1.2"},
 ```
+
+**Note:** The `gen_smtp` package is essential - it provides the `:mimemail` module that Swoosh's SMTP adapter needs for MIME encoding.
 
 ### 2. `config/runtime.exs`
 Changed from:

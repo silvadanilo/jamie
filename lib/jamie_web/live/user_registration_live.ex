@@ -20,11 +20,18 @@ defmodule JamieWeb.UserRegistrationLive do
   def handle_event("save", %{"user" => user_params}, socket) do
     case Accounts.register_user(user_params) do
       {:ok, user} ->
-        {:ok, _} =
-          Accounts.deliver_user_magic_link(
+        # Try to send magic link email, but don't fail registration if it fails
+        _result =
+          case Accounts.deliver_user_magic_link(
             user,
             &url(~p"/users/magic-link/#{&1}")
-          )
+          ) do
+            {:ok, _} -> :sent
+            {:error, reason} -> 
+              require Logger
+              Logger.error("Failed to send magic link email: #{inspect(reason)}")
+              :failed
+          end
 
         changeset = Accounts.change_user_registration(user)
         {:noreply, socket |> assign(trigger_submit: true) |> assign_form(changeset)}
