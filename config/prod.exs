@@ -8,7 +8,7 @@ import Config
 config :jamie, JamieWeb.Endpoint, cache_static_manifest: "priv/static/cache_manifest.json"
 
 # Configures Swoosh API Client
-config :swoosh, api_client: Swoosh.ApiClient.Req
+config :swoosh, :api_client, Swoosh.ApiClient.Req
 
 # Disable Swoosh Local Memory Storage
 config :swoosh, local: false
@@ -17,13 +17,11 @@ config :swoosh, local: false
 config :logger, level: :info
 
 # Force SSL for production
-config :jamie, JamieWeb.Endpoint,
-  force_ssl: [rewrite_on: [:x_forwarded_proto], hsts: true]
+config :jamie, JamieWeb.Endpoint, force_ssl: [rewrite_on: [:x_forwarded_proto], hsts: true]
 
 # Reduce Oban worker counts for production (especially for smaller databases)
 # This reduces database connection pressure
-config :jamie, Oban,
-  queues: [default: 1, emails: 1, notifications: 1]
+config :jamie, Oban, queues: [default: 1, emails: 1, notifications: 1]
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.

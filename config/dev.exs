@@ -86,18 +86,21 @@ config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
-# Configure Brevo SMTP for development
-config :jamie, Jamie.Mailer,
-  adapter: Swoosh.Adapters.SMTP,
-  relay: "smtp-relay.brevo.com",
-  port: 587,
-  username: System.get_env("BREVO_USERNAME"),
-  password: System.get_env("BREVO_PASSWORD"),
-  ssl: false,
-  tls: :if_available,
-  auth: :always,
-  retries: 2,
-  no_mx_lookups: false
+# Configure email for development
+# Using Local adapter - emails will be shown in /dev/mailbox
+# To use SMTP in development, uncomment the configuration below and set BREVO_USERNAME and BREVO_PASSWORD env vars
 
-# Swoosh API client for SMTP (not needed for local adapter)
-config :swoosh, :api_client, Swoosh.ApiClient.Req
+# config :jamie, Jamie.Mailer,
+#   adapter: Swoosh.Adapters.SMTP,
+#   relay: "smtp-relay.brevo.com",
+#   port: 587,
+#   username: System.get_env("BREVO_USERNAME"),
+#   password: System.get_env("BREVO_PASSWORD"),
+#   ssl: false,
+#   tls: :if_available,
+#   auth: :always,
+#   retries: 2,
+#   no_mx_lookups: false
+
+# Disable swoosh api client as the Local adapter doesn't need it
+config :swoosh, :api_client, false

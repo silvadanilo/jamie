@@ -23,10 +23,12 @@ defmodule JamieWeb.UserRegistrationLive do
         # Try to send magic link email, but don't fail registration if it fails
         _result =
           case Accounts.deliver_user_magic_link(
-            user,
-            &url(~p"/users/magic-link/#{&1}")
-          ) do
-            {:ok, _} -> :sent
+                 user,
+                 &url(~p"/users/magic-link/#{&1}")
+               ) do
+            {:ok, _} ->
+              :sent
+
             {:error, reason} ->
               require Logger
               Logger.error("Failed to send magic link email: #{inspect(reason)}")

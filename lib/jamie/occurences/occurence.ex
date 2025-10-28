@@ -164,7 +164,9 @@ defmodule Jamie.Occurences.Occurence do
 
     📍 Luogo: {location}
     🕐 Orario: {time}
-    💰 Contributo sala: {cost}€
+    💰 Contributo sala: {cost}
+
+    Per disdire la tua prenotazione visita: {unsubscribe_url}
 
     Se hai domande o cambiamenti, scrivimi pure.
 
@@ -188,7 +190,8 @@ defmodule Jamie.Occurences.Occurence do
     📍 Dove: {location}
     🕐 Quando: {datetime}
     ❓ Per chi: adatto a chiunque abbia voglia di praticare divertendosi e condividere momenti.
-    💰 Contributo sala: {cost}€ (contanti o Satispay)
+    💰 Contributo sala: {cost} (contanti o Satispay)
+    🔗 Link per prenotare: {event_url}
 
     📩 Per ulteriori info e prenotazioni scrivetemi in privato 😊
     """
