@@ -101,16 +101,16 @@ if config_env() == :prod do
 
   # ## Configuring the mailer
   #
-  # Configure Swoosh with Mailjet for production using SMTP
-  # Mailjet Free Plan: 6,000 emails/month (200/day)
-  # Sign up at: https://www.mailjet.com/
-  # Get your SMTP credentials from: https://app.mailjet.com/account/smtp
+  # Configure Swoosh with Brevo for production using SMTP
+  # Brevo Free Plan: 300 emails/day
+  # Sign up at: https://www.brevo.com/
+  # Get your SMTP credentials from: https://app.brevo.com/settings/keys/smtp
   config :jamie, Jamie.Mailer,
     adapter: Swoosh.Adapters.SMTP,
-    relay: "in.mailjet.com",
+    relay: "smtp-relay.brevo.com",
     port: 587,
-    username: System.get_env("MAILJET_API_KEY"),
-    password: System.get_env("MAILJET_SECRET_KEY"),
+    username: System.get_env("BREVO_USERNAME"),
+    password: System.get_env("BREVO_PASSWORD"),
     ssl: false,
     tls: :if_available,
     auth: :always,

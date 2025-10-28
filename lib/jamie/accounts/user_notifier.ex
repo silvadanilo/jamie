@@ -7,7 +7,7 @@ defmodule Jamie.Accounts.UserNotifier do
     email =
       new()
       |> to(recipient)
-      |> from({"Jamie", "noreply@jamapp.com"})
+      |> from({"Jamie", "danilo@html5.it"})
       |> subject(subject)
       |> text_body(body)
 

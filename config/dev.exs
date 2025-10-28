@@ -86,5 +86,18 @@ config :phoenix_live_view,
   # Enable helpful, but potentially expensive runtime checks
   enable_expensive_runtime_checks: true
 
-# Disable swoosh api client as it is only required for production adapters.
-config :swoosh, :api_client, false
+# Configure Brevo SMTP for development
+config :jamie, Jamie.Mailer,
+  adapter: Swoosh.Adapters.SMTP,
+  relay: "smtp-relay.brevo.com",
+  port: 587,
+  username: System.get_env("BREVO_USERNAME"),
+  password: System.get_env("BREVO_PASSWORD"),
+  ssl: false,
+  tls: :if_available,
+  auth: :always,
+  retries: 2,
+  no_mx_lookups: false
+
+# Swoosh API client for SMTP (not needed for local adapter)
+config :swoosh, :api_client, Swoosh.ApiClient.Req

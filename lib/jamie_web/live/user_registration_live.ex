@@ -27,7 +27,7 @@ defmodule JamieWeb.UserRegistrationLive do
             &url(~p"/users/magic-link/#{&1}")
           ) do
             {:ok, _} -> :sent
-            {:error, reason} -> 
+            {:error, reason} ->
               require Logger
               Logger.error("Failed to send magic link email: #{inspect(reason)}")
               :failed
