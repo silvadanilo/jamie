@@ -55,6 +55,7 @@ defmodule Jamie.MixProject do
       {:heroicons,
        github: "tailwindlabs/heroicons", tag: "v2.2.0", sparse: "optimized", app: false, compile: false, depth: 1},
       {:swoosh, "~> 1.16"},
+      {:mail, "~> 0.3"},
       {:req, "~> 0.5"},
       {:oban, "~> 2.19"},
       {:bcrypt_elixir, "~> 3.0"},
