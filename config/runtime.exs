@@ -131,4 +131,7 @@ if config_env() == :prod do
   #   api_key: System.get_env("MAILGUN_API_KEY")
 
   config :swoosh, :api_client, Swoosh.ApiClient.Req
+
+  # Configure Google Maps API key for production
+  config :jamie, google_maps_api_key: System.get_env("GOOGLE_MAPS_API_KEY")
 end
