@@ -143,35 +143,6 @@ defmodule Jamie.Occurences do
   end
 
   @doc """
-  Prepares attributes for duplicating an occurrence.
-  Returns a map with atom keys for creating a new struct.
-  Excludes date/time and other temporal fields.
-  """
-  def prepare_duplicate_attrs(%Occurence{} = occurence) do
-    %{
-      title: occurence.title,
-      description: occurence.description,
-      location: occurence.location,
-      latitude: occurence.latitude,
-      longitude: occurence.longitude,
-      google_place_id: occurence.google_place_id,
-      cost: occurence.cost,
-      photo_url: occurence.photo_url,
-      base_capacity: occurence.base_capacity,
-      flyer_capacity: occurence.flyer_capacity,
-      subscription_message: occurence.subscription_message,
-      cancellation_message: occurence.cancellation_message,
-      share_message: occurence.share_message,
-      note: occurence.note,
-      show_available_spots: occurence.show_available_spots,
-      show_partecipant_list: occurence.show_partecipant_list,
-      is_private: occurence.is_private,
-      disabled: false,
-      status: "scheduled"
-    }
-  end
-
-  @doc """
   Updates the status of an occurence.
   """
   def update_occurence_status(%Occurence{} = occurence, status)
@@ -456,46 +427,25 @@ defmodule Jamie.Occurences do
     # Check if there's an existing participant record
     existing_participant = get_participant(occurence_id, user_id)
 
-    result =
-      if existing_participant do
-        # If there's an existing participant (including cancelled), update it
-        # Update the registered_at timestamp to reflect the new registration date
-        # Clear cancelled_at when reactivating
-        attrs_with_timestamp =
-          attrs
-          |> Map.put("registered_at", DateTime.utc_now() |> DateTime.truncate(:second))
-          |> Map.put("cancelled_at", nil)
+    if existing_participant do
+      # If there's an existing participant (including cancelled), update it
+      # Update the registered_at timestamp to reflect the new registration date
+      # Clear cancelled_at when reactivating
+      attrs_with_timestamp =
+        attrs
+        |> Map.put("registered_at", DateTime.utc_now() |> DateTime.truncate(:second))
+        |> Map.put("cancelled_at", nil)
 
-        existing_participant
-        |> Participant.changeset(attrs_with_timestamp)
-        |> Repo.update()
-      else
-        # Otherwise, create a new one with registered_at set
-        attrs_with_timestamp =
-          attrs
-          |> Map.put("registered_at", DateTime.utc_now() |> DateTime.truncate(:second))
+      existing_participant
+      |> Participant.changeset(attrs_with_timestamp)
+      |> Repo.update()
+    else
+      # Otherwise, create a new one with registered_at set
+      attrs_with_timestamp =
+        attrs
+        |> Map.put("registered_at", DateTime.utc_now() |> DateTime.truncate(:second))
 
-        register_participant(attrs_with_timestamp)
-      end
-
-    # Send email notification on successful registration
-    case result do
-      {:ok, participant} ->
-        # Get the occurrence with preloaded data
-        occurence = get_occurence!(occurence_id)
-
-        # Load participant with user for email
-        participant_with_user =
-          participant
-          |> Repo.preload(:user)
-
-        # Send subscription email
-        Jamie.Occurences.Notifier.deliver_subscription_email(participant_with_user, occurence)
-
-        {:ok, participant}
-
-      error ->
-        error
+      register_participant(attrs_with_timestamp)
     end
   end
 
@@ -525,34 +475,12 @@ defmodule Jamie.Occurences do
   Cancels a participant registration.
   """
   def cancel_participant(participant) do
-    # Get the occurrence for the email
-    occurence = get_occurence!(participant.occurence_id)
-
-    # Update the participant status
-    result =
-      participant
-      |> Participant.changeset(%{
-        status: "cancelled",
-        cancelled_at: DateTime.utc_now() |> DateTime.truncate(:second)
-      })
-      |> Repo.update()
-
-    # Send email notification on successful cancellation
-    case result do
-      {:ok, participant} ->
-        # Load participant with user for email
-        participant_with_user =
-          participant
-          |> Repo.preload(:user)
-
-        # Send cancellation email
-        Jamie.Occurences.Notifier.deliver_cancellation_email(participant_with_user, occurence)
-
-        {:ok, participant}
-
-      error ->
-        error
-    end
+    participant
+    |> Participant.changeset(%{
+      status: "cancelled",
+      cancelled_at: DateTime.utc_now() |> DateTime.truncate(:second)
+    })
+    |> Repo.update()
   end
 
   @doc """

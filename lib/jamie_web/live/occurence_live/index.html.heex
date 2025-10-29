@@ -58,7 +58,9 @@
                       <.icon name="hero-calendar-days" class="h-5 w-5 text-primary" />
                     </div>
                     <div class="flex-1 min-w-0">
-                      <h3 class="font-semibold text-base break-words">{occurence.title}</h3>
+                      <.link navigate={~p"/events/#{occurence.slug}"} class="hover:underline">
+                        <h3 class="font-semibold text-base break-words">{occurence.title}</h3>
+                      </.link>
                       <div class="mt-2 space-y-1 text-sm text-base-content/70">
                         <div class="flex items-center gap-1.5">
                           <.icon name="hero-clock" class="h-4 w-4 flex-shrink-0" />
@@ -150,7 +152,9 @@
                         </div>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <h3 class="text-xl font-bold mb-2 truncate">{occurence.title}</h3>
+                        <.link navigate={~p"/events/#{occurence.slug}"} class="hover:underline">
+                          <h3 class="text-xl font-bold mb-2 truncate">{occurence.title}</h3>
+                        </.link>
                         <div class="flex flex-wrap items-center gap-4 text-sm text-base-content/70 mb-2">
                           <span class="flex items-center gap-1.5">
                             <.icon name="hero-clock" class="h-5 w-5" />
@@ -250,7 +254,9 @@
                       <.icon name="hero-calendar-days" class="h-5 w-5 text-base-content/50" />
                     </div>
                     <div class="flex-1 min-w-0">
-                      <h3 class="font-semibold text-base break-words text-base-content/60">{occurence.title}</h3>
+                      <.link navigate={~p"/events/#{occurence.slug}"} class="hover:underline">
+                        <h3 class="font-semibold text-base break-words text-base-content/60">{occurence.title}</h3>
+                      </.link>
                       <div class="mt-2 space-y-1 text-sm text-base-content/70">
                         <div class="flex items-center gap-1.5">
                           <.icon name="hero-clock" class="h-4 w-4 flex-shrink-0" />
@@ -310,7 +316,9 @@
                         </div>
                       </div>
                       <div class="flex-1 min-w-0">
-                        <h3 class="text-xl font-bold mb-2 truncate text-base-content/60">{occurence.title}</h3>
+                        <.link navigate={~p"/events/#{occurence.slug}"} class="hover:underline">
+                          <h3 class="text-xl font-bold mb-2 truncate text-base-content/60">{occurence.title}</h3>
+                        </.link>
                         <div class="flex flex-wrap items-center gap-4 text-sm text-base-content/70 mb-2">
                           <span class="flex items-center gap-1.5">
                             <.icon name="hero-clock" class="h-5 w-5" />
