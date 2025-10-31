@@ -10,7 +10,7 @@ JAM is a Phoenix LiveView application for managing jam sessions with features li
 
 ## Tech Stack
 
-- **Elixir** ~> 1.15 / **Phoenix** 1.8.1
+- **Elixir** ~> 1.19 / **Phoenix** 1.8.1
 - **PostgreSQL** with Ecto 3.13
 - **Phoenix LiveView** 1.1.0
 - **Tailwind CSS** + **DaisyUI** + **Heroicons**
@@ -22,7 +22,7 @@ JAM is a Phoenix LiveView application for managing jam sessions with features li
 
 ### Prerequisites
 
-- Elixir 1.15+
+- Elixir 1.19+
 - PostgreSQL 14+
 - Node.js (for assets)
 
